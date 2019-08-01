@@ -1,0 +1,29 @@
+{
+  "name": "gunjstrustsharekey",
+  "version": "1.0.0",
+  "description": "* Amark (https://github.com/amark/gun)",
+  "main": "gunjstrustsharekey.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lightnet/gunjstrustsharekey.git"
+  },
+  "keywords": [
+    "gunjs",
+    "seajs"
+  ],
+  "author": "Lightnet",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Lightnet/gunjstrustsharekey/issues"
+  },
+  "homepage": "https://github.com/Lightnet/gunjstrustsharekey#readme",
+  "dependencies": {
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-terser": "^1.2.0"
+  }
+}
