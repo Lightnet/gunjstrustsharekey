@@ -81,7 +81,7 @@ var Gun = (typeof window !== "undefined")? window.Gun : require('gun/gun');
 */
 Gun.on('opt', function(context) {
     context.opt.sharekeytype="path";//path working
-    //context.opt.sharekeytype="graph";//path prototype not working...
+    //context.opt.sharekeytype="graph";//prototype party working sea will convert to string.
     context.opt.sharekeydebug = false;
     context.opt.sharekeyvalue = 'value';
     this.to.next(context);
@@ -124,6 +124,7 @@ var grantkey = Gun.User.prototype.grantkey=async function(to, cb, opt){
         if(opt.sharekeytype == "graph"){
             sec = await gun.get('trust').get(pair.pub).get(gun._.get).then();
             if(sec !=null){
+                sec = window.atob(sec);
                 sec = JSON.parse(sec);
             }
             sec = await SEA.decrypt(sec, pair);
@@ -133,6 +134,7 @@ var grantkey = Gun.User.prototype.grantkey=async function(to, cb, opt){
                 //sec = Gun.text.random(16);
                 enc = await SEA.encrypt(sec, pair);
                 enc = JSON.stringify(enc);//need to be string bug root gun
+                enc = window.btoa(enc);
                 //console.log(enc);
                 gun.get('trust').get(pair.pub).get(gun._.get).put(enc);
             }
@@ -148,6 +150,7 @@ var grantkey = Gun.User.prototype.grantkey=async function(to, cb, opt){
         }
         if(opt.sharekeytype == "graph"){
             enc = JSON.stringify(enc);
+            enc = window.btoa(enc);
             //console.log(enc);
             gun.get('trust').get(pub).get(gun._.get).put(enc, cb);
         }
@@ -196,10 +199,12 @@ var revokekey = Gun.User.prototype.revokekey=async function(to, cb, opt){
         if(opt.sharekeytype == "graph"){
             sec = await gun.get('trust').get(pair.pub).get(gun._.get).then();
             if(sec !=null){
+                sec = window.atob(sec);//decode
                 sec = JSON.parse(sec);
             }
             sec = await SEA.decrypt(sec, pair);
             key = await gun.get(opt.sharekeyvalue).once().then();
+            key = window.atob(key);//decode
             key = JSON.parse(key);
             value = await SEA.decrypt(key, sec);
         }
@@ -244,31 +249,38 @@ var revokekey = Gun.User.prototype.revokekey=async function(to, cb, opt){
         }
         if(opt.sharekeytype == "graph"){
             enc = JSON.stringify(enc);//need to be string bug root gun
+            enc = window.btoa(enc);
             gun.get('trust').get(pair.pub).get(gun._.get).put(enc);
             pub = await to.get('pub').then();
 
             gun.get('trust').map().once(async (data,mkey)=>{//trust users
+                let uname = await gun.back(-1).user(mkey).get('alias').then();
                 //console.log(data,key);
                 if(pair.pub != mkey){//check self user
                     console.log(mkey);
                     if(pub == mkey){ //check user to be revoke
                         //do not here?(ban user)
+                        console.log(uname, "FAIL");
                     }else{
-                        console.log("checking....")
+                        //console.log("checking....")
                         let ckey = await gun.get('trust').get(key).get(gun._.get).then();
-                        console.log("mkey",mkey);
+                        //console.log("mkey",mkey);
+                        console.log(uname, "PASS");
                         if(ckey != "null"){//Check if there user are revoke key if they are null.
                             console.log("REASSIGN SALT KEYS");
                             
                             let mto = gun.back(-1).user(mkey);
                             //let name = await mto.get('alias').then();
                             //console.log(name);
+                            let mpub = await mto.get('pub').then();
                             let mepub = await mto.get('epub').then();
                             let dh = await SEA.secret(mepub, pair);
                             let menc = await SEA.encrypt(sec, dh);
                             menc = JSON.stringify(menc);
+                            menc = window.btoa(menc);
                             //NEW SALT KEY
-                            gun.get('trust').get(mkey).get(gun._.get).put(menc);
+                            console.log("menc:",menc);
+                            gun.get('trust').get(mpub).get(gun._.get).put(menc);
                             //console.log(usec);
                         }
                     }
@@ -285,6 +297,7 @@ var revokekey = Gun.User.prototype.revokekey=async function(to, cb, opt){
         }
         if(opt.sharekeytype == "graph"){
             v = JSON.stringify(v);
+            v = window.btoa(v);
             gun.get(opt.sharekeyvalue).put(v, cb);
         }
         // Remove Salt Key
@@ -337,18 +350,11 @@ var encryptput = Gun.User.prototype.encryptput = function(data, cb, opt){
         }
         
         if(opt.sharekeytype == "graph"){
-            //console.log(gun._.get);
-            //console.log("graph");
-            //console.log("pair.pub",pair.pub);
-            //console.log("gun._.get",gun._.get);
-            //rootgun.get('trust').get(pair.pub).get(gun._.get).once(ack=>{
-                //console.log("ACK",ack);
-            //})
-            sec = await rootgun.get('trust').get(pair.pub).get(gun._.get).then();
-            //console.log("sec",sec);
+            sec = await gun.get('trust').get(pair.pub).get(gun._.get).then();
+            console.log("SECRET RAW: ",sec);
             if(sec !=null){
                 //console.log(typeof sec);
-                //enc = window.atob(enc);
+                sec = window.atob(sec);
                 //console.log("sec",sec);
                 sec = JSON.parse(sec);
                 //sec = JSON.parse(sec);
@@ -360,21 +366,18 @@ var encryptput = Gun.User.prototype.encryptput = function(data, cb, opt){
                 sec = SEA.random(16).toString();
                 enc = await SEA.encrypt(sec, pair);
                 enc = JSON.stringify(enc);//need to be string bug root gun
-                //enc = window.btoa(enc);
-                //console.log("SECRET",enc);
-                //console.log(gun._.get);
-                //enc = "test";
-                rootgun.get('trust').get(pair.pub).get(gun._.get).put(enc);
+                enc = window.btoa(enc);
+                console.log("SECRET",enc);
+                gun.get('trust').get(pair.pub).get(gun._.get).put(enc);
             }
+            console.log("data",data)
             enc = await SEA.encrypt(data, sec);
             enc = JSON.stringify(enc);
-            //enc = window.btoa(enc);
-            //console.log("VALUE E:",enc);
-            //gun.put({value:enc}, cb);//PUT ENCRYPT DATA
-            //gun.get('value').put(enc, cb);//PUT ENCRYPT DATA
-            //gun.put(enc, cb);//does not work will effect trust list.
-            //console.log(opt.sharekeyvalue);
+            enc = window.btoa(enc);
+            //console.log("enc: ",enc);
+            //console.log("opt.sharekeyvalue: ",opt.sharekeyvalue);
             //default value
+            //gun.put({value:enc}, cb);//PUT ENCRYPT DATA
             gun.get(opt.sharekeyvalue).put(enc, cb);//PUT ENCRYPT DATA
         }
     }());
@@ -429,6 +432,9 @@ var decryptvalue = Gun.User.prototype.decryptvalue = function(cb,opt){
                 //console.log("sec:",sec);
                 return gun;
             }
+            console.log("SEC1: ",sec);
+            sec = window.atob(sec);
+            console.log("SEC2: ",sec);
             sec = JSON.parse(sec);
             //console.log("sec",sec);
             sec = await SEA.decrypt(sec, pair);
@@ -436,13 +442,15 @@ var decryptvalue = Gun.User.prototype.decryptvalue = function(cb,opt){
             //key = await gun.get('value').then();
             //console.log("opt.sharekeyvalue: ",opt.sharekeyvalue);
             key = await gun.get(opt.sharekeyvalue).then();//default 'value'
+            key = window.atob(key);
+            console.log("KEY: ",key);
             //key = await gun.then();
             key = JSON.parse(key);
             //console.log("key",key);
         }
         //console.log(key);
         let mvalue = await SEA.decrypt(key, sec);
-        //console.log(mvalue);
+        console.log(mvalue);
         cb(mvalue);
     }());
     return gun;
@@ -484,6 +492,12 @@ var decryptdata = Gun.User.prototype.decryptdata = function(to, cb, opt){
             enc1 = await gun.get('trust').get(pair.pub).get(gun._.get).then();
             if(enc1 !=null){
                 //console.log("enc1",enc1);
+                if(enc1 == "null"){
+                    console.log("Error Null || Denied!");
+                    cb(null);
+                    return gun;
+                }
+                enc1 = window.atob(enc1);
                 enc1 = JSON.parse(enc1);
             }
             //console.log(enc1);
@@ -511,6 +525,7 @@ var decryptdata = Gun.User.prototype.decryptdata = function(to, cb, opt){
         }
         if(opt.sharekeytype == "graph"){
             enc2 = await gun.get(opt.sharekeyvalue).then();
+            enc2 = window.atob(enc2);
             enc2 = JSON.parse(enc2);
         }
         //console.log(enc2);
