@@ -7,6 +7,9 @@
 
 # License: MIT
 
+# Status:
+ * Work in progress for graph key checks revoke and trusts.
+
 # Information:
  This is just helper share key setup call functions. To grant and revoke users access.
  As wel put encrypt and decrypt key value as well other users. To learn how SEA.js 
@@ -31,6 +34,7 @@ User / Gun:
 ```
 
 # To Do List:
+ * Debug and errors check keys.
  * Work on debug logging.
  * Finish and Docs.
  * Clean Up script.
