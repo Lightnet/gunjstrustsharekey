@@ -7,23 +7,29 @@
     Credit: amark ( https://github.com/amark/gun)
 
     License: MIT
-    
-    Information: To create share keys from User or Gun Graph. It will store in get('trust')
-     list map or you can change the name properties in config to make it harder ID.
 
-    User Gun trust list store in child root graph key. It where path share since dir base path.
+    Gun Notes:
+     * Work in progress
+     * with sea.js and gun.js are buggy with auth checks.
+    
+    Information: To create share keys from User or Gun Graph. By creating trust map list and 
+    key by default when encrypt function are call. Users are store in get('trust') map
+    and you can change the key name in opt config to make it harder.
+
+    User trust map store in child of root graph key. The trust store where graph path in user root.
 
     user.get(trust).get(publickey).get(pathnode).put('saltkey')
     
-    Gun graph is base where graph call encryptput function but not the root graph node.
-    It base on where the graph location to generate keys and trust list graph id to identify the
-    keys and value. Simple example is tree node that each reference with ID that can't be same
-    tree node. Each tree node has trust list if exist to share key who the owner to create it.
+    Gun graph path is independent of created key root is base where graph call encryptput function
+    but not the root graph node. It base on where the key root child graph location to generate 
+    keys and trust map graph id to identify the keys and value. Simple example is tree node that
+    each reference with ID that can't be same tree node. Each tree graph node has trust list if
+    exist to share key who the owner to create it.
 
-    Share Key config that support (Gun) `sharekeytype="graph"` (user)`sharekeytype="path"`
+    Share Key config that support Gun and User that will detect type of root for User and Gun object.
     But can't be root graph when key are made will give errors.
 
-    If get an error that object can't be used as text or string.
+    If get an error that object can't be used as text or string that root graph has to be json object.
 
     ```
     var object={// root id Object
@@ -32,31 +38,33 @@
             value:"key", //sub child
         }
     }
+    // example
+    let trust = get('trust');
+    trust.get('publickey1').put('secret key');
+    trust.get('publickey2').put('secret key');
+    gun.get('object').put({trust:trust,value:"key"}); //json object
     ```
-    This is json object format. Example how share key works. Name can be config. (work in progress)
+    This is json object format. Example how share key works. Name can be config.
 
     var object="key" //incorrect format
+    //example
+    gun.get('object').put('key') ///incorrect format, not json object
 
     //gun.get('foo').get('trust') //not here
     //user.get('trust') // since it root as well user own this graph
     gun.get('foo').get('something').encryptput('bar'); //create share key and create list
     gun.get('foo').get('something').get('trust') //it store users trust list on where encryptput graph.
     
-    gun.get('foo').encryptput('bar'); // wrong way, root require object not variable.
-    
-    It the best to salt share key genarete by default to let know anyone to your keys.
+    It the best to Share Key Genarete Salt Key by default to let know anyone to your keys.
 
     Random key used from:
      - SEA.random(16).toString();
      - Gun.text.random(16);
-
-    By Default sharekeytype="path" is for user path. For gun sharekeytype="graph" independent graph.
-    Need to check what ever need to do checks.
     
     User / Gun:
      - function grantkey (to allow owner user access to key graph value for other users. Check and create salt keys)
      - function revokekey (to owner revoke user access to key graph for user. Note it will break salt key if share with other users.)
-      - Recreate new slat key and reencrypt value.(This break other salt keys are shared.)
+      - Recreate new salt Share Key and reencrypt value.(This break other salt keys are shared.)
      - function encryptput put value (allow owner user to encrypt key value when creating and check salt key)
      - function decryptvalue return value (allow owner user to decrypt key value)
      - function decryptdata (to allow other user to decrypt key value/data from gun or sea but not self)
@@ -69,33 +77,27 @@
     (gun/user).get('any').encryptput(data,cb,{sharekeyvalue:"value",sharekeytrust:"trust",sharekeydebug:false})
     (gun/user).get('any').(grantkey|revokekey|decryptdata)(to,cb,{sharekeyvalue:"value",sharekeytrust:"trust",sharekeydebug:false})
 
-    {sharekeybbase:true} - This is for gun and not user graph.
-    {sharekeytype:"path"} -this for user and not gun.
-    {sharekeytype:"graph"} -this for gun and not user.
-    {sharekeydebug:false} -Debug key, value, and secret sea
+    {sharekeybbase:true}  - This is for gun and not user graph.
+    {sharekeydebug:false} - Debug key, value, and secret sea
 
     Notes:
      - Not tested large scale.
-     - Not work on debug fails and checks.
-     - Grant self share public key break salt key.
-     - Function conflict that no checks that override trust list.
+     - Not work on debug fails and checks. (work in progress)
+     - Grant/Revoke self share key break share keys.
      - User encrypt json format will do fine. Gun encrypt root need to string and not json.
+     - Need to fix which is user or gun root check for easy access when call function.
 */
 (function() {
     var Gun = (typeof window !== "undefined")? window.Gun : require('gun/gun');
     
-    /*
-        work in progress...
-    */
     Gun.on('opt', function(context) {
-        context.opt.sharekeytype="path";//path working
-        //context.opt.sharekeytype="graph";//prototype party working sea will convert to string.
-        context.opt.sharekeydebug = false;
+        context.opt.sharekeytype="path";// path for user //This will auto check default for gun and user
+        //context.opt.sharekeytype="graph"; //gun graph sea key will be convert to string and base (bug).
+        context.opt.sharekeydebug = true;
         context.opt.sharekeyvalue = 'value';
         context.opt.sharekeytrust = 'trust';
-        context.opt.sharekeybbase = true; //btoa, atob
+        context.opt.sharekeybbase = true; //btoa, atob //base64 ecode and decode
         this.to.next(context);
-        //console.log(context);
     });
     
     /*
@@ -117,8 +119,14 @@
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            //console.log("User PASS");
+            opt.sharekeytype = "path";
+        }else{
+            //console.log("Gun PASS");
+            opt.sharekeytype = "graph";
+        }
     
-        //console.log(path);
         (async function(){
             if(opt.sharekeydebug){
                 console.log("opt.sharekeytype: ",opt.sharekeytype);
@@ -219,7 +227,13 @@
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
-    
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            //console.log("User PASS");
+            opt.sharekeytype = "path";
+        }else{
+            //console.log("Gun PASS");
+            opt.sharekeytype = "graph";
+        }
         (async function(){
             if(opt.sharekeydebug){
                 console.log("opt.sharekeytype: ",opt.sharekeytype);
@@ -271,7 +285,6 @@
             if(opt.sharekeytype == "path"){
                 user.get(opt.sharekeytrust).get(pair.pub).get(path).put(enc);
                 pub = await to.get('pub').then();//revoke user
-                //console.log("==================================");
                 user.get(opt.sharekeytrust).once().map().once(async (data,mkey)=>{//trust users
                     let uname;
                     if(opt.sharekeydebug){
@@ -350,7 +363,6 @@
                             }
                         }
                     }
-                    
                 })
             }
             //encrypt Value
@@ -396,6 +408,15 @@
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            //console.log("User PASS");
+            opt.sharekeytype = "path";
+        }else{
+            //console.log("Gun PASS");
+            opt.sharekeytype = "graph";
+        }
+        //console.log(Gun.is(gun));//check if gun is object match
+
         (async function(){
             if(opt.sharekeydebug){
                 console.log("opt.sharekeytype: ",opt.sharekeytype);
@@ -484,6 +505,14 @@
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
     
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            //console.log("User PASS");
+            opt.sharekeytype = "path";
+        }else{
+            //console.log("Gun PASS");
+            opt.sharekeytype = "graph";
+        }
         
         (async function(){
             if(opt.sharekeydebug){
@@ -562,6 +591,14 @@
             console.log("User graph net set!");
             return gun;
         }
+
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            //console.log("User PASS");
+            opt.sharekeytype = "path";
+        }else{
+            //console.log("Gun PASS");
+            opt.sharekeytype = "graph";
+        }
     
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
         (async function(){
@@ -599,10 +636,8 @@
                 return gun;
             }
             let epub = await to.get('epub').then();
-            //console.log("epub",epub);
             //PAIR SHARE
             let mix = await SEA.secret(epub, pair);
-            //console.log("mix",mix);
             //KEY SHARE
             let key = await SEA.decrypt(enc1, mix);
             if(opt.sharekeydebug){
