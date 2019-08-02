@@ -62,18 +62,24 @@
      - function decryptdata (to allow other user to decrypt key value/data from gun or sea but not self)
       - `let to = gun.user(public key)`
      
-    User and Gun function for encrypt and decrypt key graph value.
+    User and Gun function for encrypt, decrypt and config key graph.
+    sharekeyvalue:"value"; //default  //change to assign random secret key id
+    sharekeytrust:"trust"; //default
+    (gun/user).get('any').decryptvalue(cb,{sharekeyvalue:"value",sharekeytrust:"trust",sharekeydebug:false})
+    (gun/user).get('any').encryptput(data,cb,{sharekeyvalue:"value",sharekeytrust:"trust",sharekeydebug:false})
+    (gun/user).get('any').(grantkey|revokekey|decryptdata)(to,cb,{sharekeyvalue:"value",sharekeytrust:"trust",sharekeydebug:false})
+
+    {sharekeybbase:true} - This is for gun and not user graph.
+    {sharekeytype:"path"} -this for user and not gun.
+    {sharekeytype:"graph"} -this for gun and not user.
+    {sharekeydebug:false} -Debug key, value, and secret sea
 
     Notes:
      - Not tested large scale.
      - Not work on debug fails and checks.
      - Grant self share public key break salt key.
-     - path work with user root level.
      - Function conflict that no checks that override trust list.
-     - User encrypt json format will do fine. Gun encrypt root need to string.
-     - Trust list resalt share keys work in progress.
-     - There is bug on encrypt bug for gun root has to be string 
-    not json object. It will store as string but not json that work on user root.
+     - User encrypt json format will do fine. Gun encrypt root need to string and not json.
 */
 (function() {
     var Gun = (typeof window !== "undefined")? window.Gun : require('gun/gun');
@@ -114,14 +120,22 @@
     
         //console.log(path);
         (async function(){
-            //console.log(gun);
+            if(opt.sharekeydebug){
+                console.log("opt.sharekeytype: ",opt.sharekeytype);
+            }
             let enc, sec;
             if(opt.sharekeytype == "path"){
                 sec = await user.get(opt.sharekeytrust).get(pair.pub).get(path).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 sec = await SEA.decrypt(sec, pair);
                 if(!sec){
                     //console.log("CREATE SALT KEY")
                     sec = SEA.random(16).toString();
+                    if(opt.sharekeydebug){
+                        console.log("CREATE SECRET: ",sec);
+                    }
                     //sec = Gun.text.random(16);
                     enc = await SEA.encrypt(sec, pair);
                     user.get(opt.sharekeytrust).get(pair.pub).get(path).put(enc);
@@ -129,6 +143,9 @@
             }
             if(opt.sharekeytype == "graph"){
                 sec = await gun.get(opt.sharekeytrust).get(pair.pub).get(gun._.get).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 if(sec !=null){
                     if(opt.sharekeybbase){
                         sec = window.atob(sec);
@@ -139,6 +156,9 @@
                 if(!sec){
                     //console.log("CREATE SALT KEY")
                     sec = SEA.random(16).toString();
+                    if(opt.sharekeydebug){
+                        console.log("CREATE SECRET: ",sec);
+                    }
                     //sec = Gun.text.random(16);
                     enc = await SEA.encrypt(sec, pair);
                     enc = JSON.stringify(enc);//need to be string bug root gun
@@ -156,6 +176,9 @@
             let dh = await SEA.secret(epub, pair);
             enc = await SEA.encrypt(sec, dh);
             if(opt.sharekeytype == "path"){
+                if(opt.sharekeydebug){
+                    console.log("TO sec: ",enc);
+                }
                 user.get(opt.sharekeytrust).get(pub).get(path).put(enc, cb);
             }
             if(opt.sharekeytype == "graph"){
@@ -164,6 +187,9 @@
                     enc = window.btoa(enc);
                 }
                 //console.log(enc);
+                if(opt.sharekeydebug){
+                    console.log("TO sec: ",enc);
+                }
                 gun.get(opt.sharekeytrust).get(pub).get(gun._.get).put(enc, cb);
             }
         }());
@@ -195,6 +221,9 @@
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
     
         (async function(){
+            if(opt.sharekeydebug){
+                console.log("opt.sharekeytype: ",opt.sharekeytype);
+            }
             let alias = await to.get("alias").then();
             let pub;
             //console.log(alias);
@@ -206,12 +235,18 @@
             let enc, sec, key, value;
             if(opt.sharekeytype == "path"){
                 sec = await user.get(opt.sharekeytrust).get(pair.pub).get(path).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 sec = await SEA.decrypt(sec, pair);
                 key = await gun.once().then();
                 value = await SEA.decrypt(key, sec);
             }
             if(opt.sharekeytype == "graph"){
                 sec = await gun.get(opt.sharekeytrust).get(pair.pub).get(gun._.get).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 if(sec !=null){
                     if(opt.sharekeybbase){
                         sec = window.atob(sec);//decode
@@ -226,7 +261,9 @@
                 key = JSON.parse(key);
                 value = await SEA.decrypt(key, sec);
             }
-            console.log("value",value);
+            if(opt.sharekeydebug){
+                console.log("VALUE: ",value);
+            }
             // Create New Salt Key
             sec = SEA.random(16).toString();
             //sec = Gun.text.random(16);
@@ -234,32 +271,37 @@
             if(opt.sharekeytype == "path"){
                 user.get(opt.sharekeytrust).get(pair.pub).get(path).put(enc);
                 pub = await to.get('pub').then();//revoke user
-                console.log("==================================");
+                //console.log("==================================");
                 user.get(opt.sharekeytrust).once().map().once(async (data,mkey)=>{//trust users
-                    let uname = await gun.back(-1).user(mkey).get('alias').then();
-                    //let ukey = await user.get(opt.sharekeytrust).get(mkey).get(path).then();
-                    //console.log(uname, ukey);
+                    let uname;
+                    if(opt.sharekeydebug){
+                        uname = await gun.back(-1).user(mkey).get('alias').then();
+                    }
                     if(pair.pub != mkey){//check self user to be resalt
-                        console.log(mkey);
                         if(pub == mkey){ //check user to be revoke
                             //do nothing??? (revoke user)
-                            console.log(uname, "FAIL");
+                            if(opt.sharekeydebug){
+                                console.log(uname, "FAIL");
+                            }
                         }else{
                             let ckey = await user.get(opt.sharekeytrust).get(mkey).get(path).then();
-                            console.log(uname, "PASS");
+                            if(opt.sharekeydebug){
+                                console.log(uname, "PASS");
+                            }
                             if(ckey != "null"){//Check if there user are revoke key if they are null should be ignore.
-                                console.log(uname, "CREATE NEW SALT SHARE KEY ");
+                                if(opt.sharekeydebug){
+                                    console.log(uname, "CREATE NEW SALT SHARE KEY ");
+                                }
                                 let mto = gun.back(-1).user(mkey);
-                                //let name = await mto.get('alias').then();
-                                //console.log(name);
                                 let mpub = await mto.get('pub').then();
                                 let mepub = await mto.get('epub').then();
                                 let dh = await SEA.secret(mepub, pair);
                                 let menc = await SEA.encrypt(sec, dh);
                                 //NEW SALT KEY
-                                //console.log("menc",menc);
+                                if(opt.sharekeydebug){
+                                    console.log("NEW SHARE KEY: ",menc);
+                                }
                                 user.get(opt.sharekeytrust).get(mpub).get(path).put(menc);
-                                //console.log(usec);
                             }
                         }
                     }
@@ -272,47 +314,48 @@
                 pub = await to.get('pub').then();
     
                 gun.get(opt.sharekeytrust).map().once(async (data,mkey)=>{//trust users
-                    let uname = await gun.back(-1).user(mkey).get('alias').then();
-                    //console.log(data,key);
+                    let uname;
+                    if(opt.sharekeydebug){
+                        uname = await gun.back(-1).user(mkey).get('alias').then();
+                    }
                     if(pair.pub != mkey){//check self user
-                        console.log(mkey);
                         if(pub == mkey){ //check user to be revoke
                             //do not here?(ban user)
-                            console.log(uname, "FAIL");
+                            if(opt.sharekeydebug){
+                                console.log(uname, "FAIL");
+                            }
                         }else{
-                            //console.log("checking....")
                             let ckey = await gun.get(opt.sharekeytrust).get(key).get(gun._.get).then();
-                            //console.log("mkey",mkey);
-                            console.log(uname, "PASS");
+                            if(opt.sharekeydebug){
+                                console.log(uname, "PASS");
+                            }
                             if(ckey != "null"){//Check if there user are revoke key if they are null.
-                                console.log("REASSIGN SALT KEYS");
-                                
+                                if(opt.sharekeydebug){
+                                    console.log(uname, "NEW SHARE KEY!");
+                                }
                                 let mto = gun.back(-1).user(mkey);
-                                //let name = await mto.get('alias').then();
-                                //console.log(name);
                                 let mpub = await mto.get('pub').then();
                                 let mepub = await mto.get('epub').then();
                                 let dh = await SEA.secret(mepub, pair);
+                                //NEW SHARE KEY
                                 let menc = await SEA.encrypt(sec, dh);
                                 menc = JSON.stringify(menc);
                                 if(opt.sharekeybbase){
                                     menc = window.btoa(menc);
                                 }
-                                //NEW SALT KEY
-                                console.log("menc:",menc);
+                                if(opt.sharekeydebug){
+                                    console.log("NEW SHARE KEY: ",menc);
+                                }
                                 gun.get(opt.sharekeytrust).get(mpub).get(gun._.get).put(menc);
-                                //console.log(usec);
                             }
                         }
                     }
                     
                 })
             }
-            //console.log("value",value);
             //encrypt Value
             let v = await SEA.encrypt(value, sec);
             if(opt.sharekeytype == "path"){
-                //console.log("VALUE SEC:",v);
                 gun.put(v, cb);
             }
             if(opt.sharekeytype == "graph"){
@@ -322,13 +365,13 @@
                 }
                 gun.get(opt.sharekeyvalue).put(v, cb);
             }
-            // Remove Salt Key
+            // REMOVE SHARE KEY
             pub = await to.get('pub').then();
             if(opt.sharekeytype == "path"){
-                user.get(opt.sharekeytrust).get(pub).get(path).put("null", cb);//remove key
+                user.get(opt.sharekeytrust).get(pub).get(path).put("null", cb);//REMOVE SECRET KEY
             }
             if(opt.sharekeytype == "graph"){
-                gun.get(opt.sharekeytrust).get(pub).get(gun._.get).put("null", cb);//remove key
+                gun.get(opt.sharekeytrust).get(pub).get(gun._.get).put("null", cb);//REMOVE SECRET KEY
             }
     
         }());
@@ -354,60 +397,65 @@
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
         opt.sharekeybbase = opt.sharekeybbase ||  gun._.root.opt.sharekeybbase;
         (async function(){
-            //console.log("path",path);
-            let enc, sec;        
-            //console.log("sharekeytype: ", opt.sharekeytype);
+            if(opt.sharekeydebug){
+                console.log("opt.sharekeytype: ",opt.sharekeytype);
+            }
+            let enc, sec;
             if(opt.sharekeytype == "path"){
                 sec = await user.get(opt.sharekeytrust).get(pair.pub).get(path).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 sec = await SEA.decrypt(sec, pair);
                 if(!sec){
-                    //console.log("CREATE SECRET!");
-                    //console.log("IF SALT KEY DOES NOT EXIST, CREATE IT!");
                     sec = SEA.random(16).toString();
+                    if(opt.sharekeydebug){
+                        console.log("CREATE SECRET: ",sec);
+                    }
                     //sec = Gun.text.random(16);
                     enc = await SEA.encrypt(sec, pair);
                     user.get(opt.sharekeytrust).get(pair.pub).get(path).put(enc);
                 }
                 enc = await SEA.encrypt(data, sec);
-                //console.log("enc",enc);
                 gun.put(enc, cb);//PUT ENCRYPT DATA
             }
             
             if(opt.sharekeytype == "graph"){
                 sec = await gun.get(opt.sharekeytrust).get(pair.pub).get(gun._.get).then();
-                console.log("SECRET RAW: ",sec);
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 if(sec !=null){
-                    //console.log(typeof sec);
                     if(opt.sharekeybbase){
                         sec = window.atob(sec);
                     }
-                    //console.log("sec",sec);
                     sec = JSON.parse(sec);
-                    //sec = JSON.parse(sec);
                     sec = await SEA.decrypt(sec, pair);
                 }
-                console.log("SECRET: ",sec);
                 if(!sec){
-                    console.log("CREATE!");
                     sec = SEA.random(16).toString();
+                    if(opt.sharekeydebug){
+                        console.log("CREATE SECRET: ",sec);
+                    }
                     enc = await SEA.encrypt(sec, pair);
                     enc = JSON.stringify(enc);//need to be string bug root gun
                     if(opt.sharekeybbase){
                         enc = window.btoa(enc);
                     }
-                    console.log("SECRET",enc);
+                    if(opt.sharekeydebug){
+                        console.log("SECRET ENC: ",enc);
+                    }
                     gun.get(opt.sharekeytrust).get(pair.pub).get(gun._.get).put(enc);
                 }
-                console.log("data",data)
+                if(opt.sharekeydebug){
+                    console.log("DATA: ",data);
+                }
                 enc = await SEA.encrypt(data, sec);
                 enc = JSON.stringify(enc);
                 if(opt.sharekeybbase){
                     enc = window.btoa(enc);
                 }
-                //console.log("enc: ",enc);
-                //console.log("opt.sharekeyvalue: ",opt.sharekeyvalue);
-                //default value
-                //gun.put({value:enc}, cb);//PUT ENCRYPT DATA
+                //gun put need be child key value
                 gun.get(opt.sharekeyvalue).put(enc, cb);//PUT ENCRYPT DATA
             }
         }());
@@ -438,57 +486,51 @@
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
         
         (async function(){
+            if(opt.sharekeydebug){
+                console.log("opt.sharekeytype: ",opt.sharekeytype);
+            }
             let sec, key;
             if(opt.sharekeytype == "path"){
-                //console.log(path);
-                //SECRET
                 sec = await user.get(opt.sharekeytrust).get(pair.pub).get(path).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 if(!sec){
                     cb(null);
                     return gun;
                 }
-                //console.log("sec",sec);
                 sec = await SEA.decrypt(sec, pair);
-                //console.log("sec",sec);
                 key = await gun.then();
-                //console.log("key",key);
             }
             if(opt.sharekeytype == "graph"){
-                console.log("graph!");
-                //SECRET
                 sec = await gun.get(opt.sharekeytrust).get(pair.pub).get(gun._.get).then();
-                //console.log("sec:",sec);
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",sec);
+                }
                 if(!sec){
                     cb(null);
-                    //console.log("sec:",sec);
                     return gun;
                 }
-                console.log("SEC1: ",sec);
                 if(opt.sharekeybbase){
                     sec = window.atob(sec);
                 }
-                console.log("SEC2: ",sec);
                 sec = JSON.parse(sec);
-                //console.log("sec",sec);
                 sec = await SEA.decrypt(sec, pair);
-                //VALUE
-                //key = await gun.get('value').then();
-                //console.log("opt.sharekeyvalue: ",opt.sharekeyvalue);
                 key = await gun.get(opt.sharekeyvalue).then();//default 'value'
+                if(opt.sharekeydebug){
+                    console.log("VALUE SEC: ",key);
+                }
                 if(key !=null){
-                    console.log("key",key);
                     if(opt.sharekeybbase){
                         key = window.atob(key);
                     }
-                    console.log("KEY: ",key);
-                    //key = await gun.then();
                     key = JSON.parse(key);
-                    //console.log("key",key);
                 }
             }
-            //console.log(key);
             let mvalue = await SEA.decrypt(key, sec);
-            console.log(mvalue);
+            if(opt.sharekeydebug){
+                console.log("VALUE: ", mvalue);
+            }
             cb(mvalue);
         }());
         return gun;
@@ -523,15 +565,23 @@
     
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
         (async function(){
+            if(opt.sharekeydebug){
+                console.log("opt.sharekeytype: ",opt.sharekeytype);
+            }
             //KEY SALT
             let enc1
             if(opt.sharekeytype == "path"){
                 enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",enc1);
+                }
             }
             if(opt.sharekeytype == "graph"){
                 enc1 = await gun.get('trust').get(pair.pub).get(gun._.get).then();
+                if(opt.sharekeydebug){
+                    console.log("SECRET: ",enc1);
+                }
                 if(enc1 !=null){
-                    //console.log("enc1",enc1);
                     if(enc1 == "null"){
                         console.log("Error Null || Denied!");
                         cb(null);
@@ -542,16 +592,12 @@
                     }
                     enc1 = JSON.parse(enc1);
                 }
-                //console.log(enc1);
             }
-            //console.log("enc1",enc1);
             if(!enc1){
                 console.log("Error Null || Denied!");
                 cb(null);
                 return gun;
             }
-            //enc1 = "SEA"+ JSON.stringify(enc1);
-            //console.log(enc1);
             let epub = await to.get('epub').then();
             //console.log("epub",epub);
             //PAIR SHARE
@@ -559,25 +605,31 @@
             //console.log("mix",mix);
             //KEY SHARE
             let key = await SEA.decrypt(enc1, mix);
-            console.log("key",key);
+            if(opt.sharekeydebug){
+                console.log("key: ",key);
+            }
             //VALUE
             let enc2 
             if(opt.sharekeytype == "path"){
                 enc2 = await gun.then();
+                if(opt.sharekeydebug){
+                    console.log("VALUE sec: ",enc2);
+                }
             }
             if(opt.sharekeytype == "graph"){
                 enc2 = await gun.get(opt.sharekeyvalue).then();
+                if(opt.sharekeydebug){
+                    console.log("VALUE sec: ",enc2);
+                }
                 if(opt.sharekeybbase){
                     enc2 = window.atob(enc2);
                 }
                 enc2 = JSON.parse(enc2);
             }
-            //console.log(enc2);
-            //enc2 = "SEA"+ JSON.stringify(enc2);
-            //console.log(enc);
-            //console.log(gun);
             let dvalue = await SEA.decrypt(enc2, key);
-            //console.log(dvalue);
+            if(opt.sharekeydebug){
+                console.log("VALUE: ",dvalue);
+            }
             cb(dvalue);
         }());
         return gun;
