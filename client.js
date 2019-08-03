@@ -131,6 +131,19 @@ $("#revokekey").click(async function(){
     }
 });
 
+$("#accesskey").keyup(async function() {
+    let key = $('#accesskey').val();
+    if(key.length == 0){
+        console.log("EMPTY!");
+        return;
+    }
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if(who != null){
+        $('#lookalias').text(who);
+    }
+});
+
 //===============================================
 // SEARCH
 

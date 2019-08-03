@@ -10,8 +10,8 @@
     License: MIT
 
     Gun Notes:
-     * Work in progress
-     * with sea.js and gun.js are buggy with auth checks.
+     * Test build.
+     * sea.js and gun.js are buggy with auth checks.
     
     Information: To create share keys from User or Gun Graph. By creating trust map list and 
     key by default when encrypt function are call. Users are store in get('trust') map
