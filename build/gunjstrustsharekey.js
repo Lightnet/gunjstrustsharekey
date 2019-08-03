@@ -1,6 +1,7 @@
 /*
     Self contain Sandbox Gun Module:
     
+    version: 2.0
 
     Created by: Lightnet
 
@@ -86,12 +87,13 @@
      - Grant/Revoke self share key break share keys.
      - User encrypt json format will do fine. Gun encrypt root need to string and not json.
      - Need to fix which is user or gun root check for easy access when call function.
+     - when user is store in root but when get from `let to = gun.user('key')` will not auto detect as user but gun object.
 */
 (function() {
     var Gun = (typeof window !== "undefined")? window.Gun : require('gun/gun');
     
     Gun.on('opt', function(context) {
-        context.opt.sharekeytype="path";// path for user //This will auto check default for gun and user
+        //context.opt.sharekeytype="path";// path for user //This will auto check default for gun and user
         //context.opt.sharekeytype="graph"; //gun graph sea key will be convert to string and base (bug).
         context.opt.sharekeydebug = true;
         context.opt.sharekeyvalue = 'value';
@@ -114,7 +116,6 @@
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
     
-        opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;
         opt.sharekeydebug = opt.sharekeydebug ||  gun._.root.opt.sharekeydebug;
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
@@ -222,7 +223,6 @@
         //console.log(path);
         if(!to){console.log("to User not set!");}
     
-        opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;
         opt.sharekeydebug = opt.sharekeydebug ||  gun._.root.opt.sharekeydebug;
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
@@ -403,7 +403,7 @@
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         let rootgun = this;
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;//Check sharekey type
+
         opt.sharekeydebug = opt.sharekeydebug ||  gun._.root.opt.sharekeydebug;
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
@@ -498,7 +498,6 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
     
-        opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;
         opt.sharekeydebug = opt.sharekeydebug ||  gun._.root.opt.sharekeydebug;
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
@@ -581,7 +580,7 @@
         cb = cb || function(ctx) { return ctx };
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
-        opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;
+        //opt.sharekeytype = opt.sharekeytype || gun._.root.opt.sharekeytype;
         opt.sharekeydebug = opt.sharekeydebug ||  gun._.root.opt.sharekeydebug;
         opt.sharekeyvalue = opt.sharekeyvalue ||  gun._.root.opt.sharekeyvalue;
         opt.sharekeytrust = opt.sharekeytrust ||  gun._.root.opt.sharekeytrust;
@@ -591,13 +590,14 @@
             console.log("User graph net set!");
             return gun;
         }
+        console.log(opt.sharekeydebug);
 
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             //console.log("User PASS");
-            opt.sharekeytype = "path";
+            opt.sharekeytype = opt.sharekeytype || "path";
         }else{
             //console.log("Gun PASS");
-            opt.sharekeytype = "graph";
+            opt.sharekeytype = opt.sharekeytype || "graph";
         }
     
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
