@@ -84,7 +84,6 @@ $("#inputalias").keyup(function() {
     let aliasval = $("#inputalias").val();
     console.log(aliasval);
     let user = gun.user();
-
     user.get('profile').get('alias').encryptput($("#inputalias").val());
 });
 
@@ -156,5 +155,5 @@ $("#inputsearchpublickey").keyup(async function() {
     to.get('profile').get('alias').decryptdata(to,ack=>{
         console.log(ack)
         $('#dataalias').val(ack);
-    },{sharetype:"user"})
+    },{sharetype:"user",sharekeytype:"path"})
 });

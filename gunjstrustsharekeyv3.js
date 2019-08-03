@@ -1,13 +1,9 @@
 /*
     Self contain Sandbox Gun Module:
-    
-    version: 2.0
-
     Created by: Lightnet
-
-    Credit: amark ( https://github.com/amark/gun)
-
     License: MIT
+    Version: 3.0
+    Credit: amark ( https://github.com/amark/gun)
 
     Gun Notes:
      * Work in progress
@@ -70,7 +66,6 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-
         let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
         let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
         let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
@@ -81,7 +76,6 @@
         }else{
             sharetype = "gun";
         }
-
         (async function(){
             if(sharetype == "user"){
                 let alias = await to.get("alias").then();
@@ -220,7 +214,6 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-
         let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
         let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
         let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;

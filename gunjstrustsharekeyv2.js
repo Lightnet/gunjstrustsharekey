@@ -10,8 +10,8 @@
     License: MIT
 
     Gun Notes:
-     * Test build.
-     * sea.js and gun.js are buggy with auth checks.
+     * Work in progress
+     * with sea.js and gun.js are buggy with auth checks.
     
     Information: To create share keys from User or Gun Graph. By creating trust map list and 
     key by default when encrypt function are call. Users are store in get('trust') map
@@ -108,7 +108,7 @@
         let to = gun.user(publickey);
         user.get('profile').get('alias').grantkey(to);
     */
-    var grantkey = Gun.User.prototype.grantkey=async function(to, cb, opt){
+    function grantkey(to, cb, opt){
         // added new user to key to share current graph key
         console.log("`.grantkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -204,7 +204,6 @@
         }());
         return gun;
     }
-    Gun.chain.grantkey = grantkey;
     /*
         //- Recreated new salt key to share.
         //- reencrypt key value on new salt
@@ -213,7 +212,7 @@
         let to = gun.user(publickey);
         user.get('profile').get('alias').revokekey(to);
     */
-    var revokekey = Gun.User.prototype.revokekey=async function(to, cb, opt){
+    function revokekey(to, cb, opt){
         // recreated new salt key share current graph key
         console.log("`.revokekey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -389,13 +388,12 @@
         }());
         return gun;
     }
-    Gun.chain.revokekey = revokekey;
     /*
         //user...encryptput(value);
         let user = gun.user();
         user.get('profile').get('alias').encryptput("name");
     */
-    var encryptput = Gun.User.prototype.encryptput = function(data, cb, opt){
+    function encryptput(data, cb, opt){
         // encrypt key > put value
         console.log("`.encryptput` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -482,8 +480,6 @@
         }());
         return gun;
     }
-    
-    Gun.chain.encryptput = encryptput;
     /*
         user...decryptvalue(cb);
         let user = gun.user();
@@ -491,7 +487,7 @@
             //console.log(ack);
         });
     */
-    var decryptvalue = Gun.User.prototype.decryptvalue = function(cb,opt){
+    function decryptvalue(cb,opt){
         //get decrypt key to return value
         console.log("`.decryptvalue` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -563,7 +559,6 @@
         }());
         return gun;
     }
-    Gun.chain.decryptvalue = decryptvalue;
     //working to decrypt data??
     /*
         //user...decryptdata(to,db);
@@ -574,7 +569,7 @@
             console.log(ack);
         });
     */
-    var decryptdata = Gun.User.prototype.decryptdata = function(to, cb, opt){
+    function decryptdata(to, cb, opt){
         // gun graph to decrypt key to return value
         console.log("`.decryptdata` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -669,7 +664,11 @@
         }());
         return gun;
     }
-    //this deal with gun root function call
+    //SETUP FUNCTION for GUN
+    Gun.chain.grantkey = grantkey;
+    Gun.chain.revokekey = revokekey;
+    Gun.chain.encryptput = encryptput;
+    Gun.chain.decryptvalue = decryptvalue;
     Gun.chain.decryptdata = decryptdata;
     
 }());

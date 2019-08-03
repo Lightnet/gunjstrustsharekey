@@ -94,7 +94,7 @@
         let to = gun.user(publickey);
         user.get('profile').get('alias').grantkey(to);
     */
-    Gun.User.prototype.grantkey=async function(to, cb){
+    function grantkey(to, cb){
         // added new user to key to share current graph key
         console.log("`.grantkey` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
@@ -128,7 +128,7 @@
         let to = gun.user(publickey);
         user.get('profile').get('alias').revokekey(to);
     */
-    Gun.User.prototype.revokekey=async function(to, cb){
+    function revokekey(to, cb){
         // recreated new salt key share current graph key
         console.log("`.revokekey` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
@@ -214,7 +214,7 @@
         let user = gun.user();
         user.get('profile').get('alias').encryptput("name");
     */
-    Gun.User.prototype.encryptput = function(data, cb){
+    function encryptput(data, cb){
         // encrypt key > put value
         console.log("`.encryptput` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
@@ -252,7 +252,7 @@
             //console.log(ack);
         });
     */
-    Gun.User.prototype.decryptvalue = function(cb){
+    function decryptvalue(cb){
         //get decrypt key to return value
         console.log("`.decryptvalue` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -284,7 +284,7 @@
             console.log(ack);
         });
     */
-    var decryptdata = Gun.User.prototype.decryptdata = function(to, cb){
+    function decryptdata(to, cb){
         // gun graph to decrypt key to return value
         console.log("`.decryptdata` PROTOTYPE API MAY BE DELETED OR CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -332,7 +332,11 @@
         }());
         return gun;
     }
-    //this deal with gun root function call
+    //SETUP FUNCTION for GUN
+    Gun.chain.grantkey = grantkey;
+    Gun.chain.revokekey = revokekey;
+    Gun.chain.encryptput = encryptput;
+    Gun.chain.decryptvalue = decryptvalue;
     Gun.chain.decryptdata = decryptdata;
     
-    }());
+}());
