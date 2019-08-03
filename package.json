@@ -4,7 +4,7 @@
   "description": "* Amark (https://github.com/amark/gun)",
   "main": "gunjstrustsharekey.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "gulp": "^4.0.2",
     "gulp-concat": "^2.6.1",
     "gulp-sourcemaps": "^2.6.5",
-    "gulp-terser": "^1.2.0"
+    "gulp-terser": "^1.2.0",
+    "gun": "^0.2019.726"
   }
 }

@@ -8,11 +8,11 @@
 # License: MIT
 
 # Status:
- * Work in progress for graph key checks revoke and trusts.
+ * Work in progress for user and gun graph for key and value checks revoke and trusts.
 
 # Information:
  This is just helper share key setup call functions. To grant and revoke users access.
- As wel put encrypt and decrypt key value as well other users. To learn how SEA.js 
+ As well put encrypt and decrypt key value as well other users. To learn how SEA.js 
  (Security Encryption Authorization ) that works with gun.js.
 
  * https://gun.eco/docs/SEA

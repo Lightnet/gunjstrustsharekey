@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title></title>
+    <meta name="description" content="">
+    <!--<link id="favicon" rel="icon" href="" type="image/x-icon">-->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- import the webpage's stylesheet -->
+    <!--<link rel="stylesheet" href="/style.css">-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
+    <script src="/gunjstrustsharekeyv3.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    
+    <!--
+    <script src="/gun.js" defer></script>
+    -->
+  </head>
+  <body>
+    <main>
+      <labe>Nodejs http with Gun.js</labe>
+      <div id="guntext">
+        ...
+      </div>
+
+      <button id="btngun">Gun</button>
+      <button id="btnuser">User</button>
+        <div id="login">
+            Alias:<input id="alias" value="test" />
+            Passphrase:<input id="passphrase" value="test" />
+            <button id="btnlogin">Login</button>
+            <button id="btnregister">Register</button>
+        </div>
+
+        <div id="profile">
+            Public Key: <input id="aliaspublickey" readonly><button id="copypublickey">Copy</button>
+
+            <br>Profile:<label id="username"></label>
+            <br>
+            <br> Public Access Key: <input id="accesskey" />
+            <br>Alias: <input id="inputalias" /> 
+            <button id="getalias"> Get Value </button> 
+            <button id="grantkey"> Grant </button> 
+            <button id="revokekey"> Revoke </button>
+            <br>
+            <br> Search Public Key:
+            <br> <input id="inputsearchpublickey" />
+            <br> Alias: <input id="dataalias" />
+
+        </div>
+        <script src="/client.js" defer></script>
+
+    </main>
+    <footer>
+    </footer>
+  </body>
+</html>

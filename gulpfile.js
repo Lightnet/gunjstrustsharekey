@@ -3,9 +3,11 @@ const concat = require('gulp-concat');
 const terser = require('gulp-terser');
 const sourcemaps = require('gulp-sourcemaps');
 
+var scriptsharekeyfile = 'gunjstrustsharekeyv2.js';
+
 function js() {
     let bsourcemaps = false;
-    return src('gunjstrustsharekey.js', { sourcemaps: bsourcemaps })
+    return src(scriptsharekeyfile, { sourcemaps: bsourcemaps })
         //.pipe(sourcemaps.init())
         //.pipe(terser())
         //.pipe(sourcemaps.write('./'))
@@ -15,7 +17,7 @@ function js() {
 
 function jsmin() {
     let bsourcemaps = true;
-    return src('gunjstrustsharekey.js', { sourcemaps: bsourcemaps })
+    return src(scriptsharekeyfile, { sourcemaps: bsourcemaps })
         //.pipe(sourcemaps.init())
         .pipe(terser())
         //.pipe(sourcemaps.write('./'))
@@ -25,4 +27,4 @@ function jsmin() {
 exports.js = js;
 exports.jsmin = jsmin;
 
-exports.default = parallel(js,jsmin);
+exports.default = parallel(js, jsmin);
