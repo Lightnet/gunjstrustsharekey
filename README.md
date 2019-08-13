@@ -38,3 +38,99 @@ User / Gun:
  * Work on debug logging.
  * Finish and Docs.
  * Clean Up script.
+
+# Design & Guide:
+ gun.js is database graph. By using namespace graph to check type object. That is need to create unique key or id on namespace root graph to identify as json object.
+
+ ```javascript
+  //json object
+  gun.get('test').put({foo:"bar"}) //new data
+  gun.get('test').put({test:"bar"}) //new data merge 
+
+  gun.get('foo').put({foo:'bar'})
+
+  gun.get('random-id-key').put({foo:'bar'})
+
+  gun.get('namespace-root').put({foo:'bar'})
+
+ ```
+ By default keys are generate by uuid to kept the database record revision key and value. If there another json or array it will create keys.
+ 
+ To create share key to need to add sea.js to client browser.
+
+ ```html
+  ...
+  <head>
+    <!-- Required -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <!-- optional -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
+    <!-- Required -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+  </head>
+  ...
+ ```
+  sea.js is add to gun.js for Security, Encryption, & Authorization - SEA. The reason is simple that encrypt and decrypt will not work when trying to read data without sea.js script to run correctly.
+
+ https://gun.eco/docs/SEA
+
+ Sea functions:
+ ```
+  SEA.pair()
+  SEA.encrypt
+  SEA.sign
+  SEA.verify
+  SEA.decrypt
+  SEA.work
+ ``` 
+
+ Using the simple example gunjstrustsharekeyv1.js. To create those will need gun/lib/then for it work. One reason is to return value or data.
+
+ It base on user root access. It is prevent write data but only user who login and access to read and write. For other user who can only read data if encrypt or not encrypt data. By using sea.js from gun.js package npm or url package cdn.
+
+ Example:
+
+ ```javascript
+  let user = gun.user();//current user that is login
+  user.get('profile').put({foo:"bar"}); //edit and write
+ ```
+
+ ```javascript
+  let to = gun.user('user-public-key');//user read only
+  to.get('profile').put({foo:"bar"});//denied write not owner
+ ```
+ The graph sea.js create and auth has key checks to prevent imposter editing it. But there is public access to read, write, edit, and delete. That is beside user.js is gun.js.
+
+```javascript
+ gun.get('namespace').get('child').put({foo:"bar"})
+```
+
+```javascript
+  let user = gun.user();
+  user.get('profile').put({foo:"bar"});
+ ```
+
+## Map
+ gun has simalar to javascript object when getting key and value
+
+```javascript
+var o={foo:"bar"}; //json object
+for(let i in o){
+  //key
+  console.log("key ",i);
+  //value
+  console.log("value ",o[i]);
+}
+```
+
+```javascript
+gun.get('o').put({foo:"bar"}); //json object
+gun.get('o').map().once(function(value, key){
+  console.log("value",value);
+  console.log("key",key);
+});
+```
+
+It be used as trust keys and public keys that store who own user root.
+
+work in progress...
