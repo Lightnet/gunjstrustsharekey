@@ -8,7 +8,8 @@
 # License: MIT
 
 # Status:
- * Work in progress for user and gun graph for key and value checks revoke and trusts.
+ * Work in progress. 
+ * User function trust (unknown).
 
 # Information:
  This is just helper share key setup call functions. To grant and revoke users access.
@@ -20,6 +21,7 @@
 Working Javascript: 
  * Nodejs (Not working atm)
  * Browser (Working)
+ * v3 work in progress.
 
 # Features: 
 ```
@@ -31,6 +33,7 @@ User / Gun:
  - function decryptvalue return value (allow owner user to decrypt key value)
  - function decryptdata (to allow other user to decrypt key value/data from gun or sea but not self)
   - `let to = gun.user(public key)`
+ - function decryptonce (v3) (to allow other user to decrypt key value/data from user not gun.get('namespace'))
 ```
 
 # To Do List:
