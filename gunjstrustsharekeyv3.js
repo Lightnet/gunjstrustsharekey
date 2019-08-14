@@ -57,39 +57,33 @@
         }else{
             sharetype = "gun";
         }
-
         let each = {};
         (async function(){
             //make sure that user root
             if(sharetype == "user"){
-                console.log(gun);
+                //console.log(gun);
                 //sea.js
                 //line 792
                 //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
                 //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
                 //let tmp = '~'+pair.pub;
-                //tmp = Gun.val.link.ify(tmp);
-                //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
-                //console.log(tmp);
+                gun.map(function(data,key){
+                    console.log(data)
+                    console.log(key)
+                });
 
-                //gun.put(Gun.obj.put({}, aliaspub, Gun.val.link.ify(aliaspub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                //each.soul=function(data){
-                    //console.log(data);
-                //};
-
-                //each.node = function(node, soul){
-                    //console.log("soul",soul)
-                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
-                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
-                //};
                 each.nodetest = function(node, soul){
-                    console.log("node",node)
-                    console.log("soul",soul)
+                    //console.log("node",node);
+                    //console.log("soul",soul);
                     //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
                     //Gun.obj.map(node, each.way, {soul: soul, node: node});
                 };
-                Gun.obj.map(gun, each.nodetest);
-                console.log("done!");
+                //Gun.obj.map(gun, each.nodetest);
+                Gun.obj.map(gun._.put, each.nodetest);
+                //console.log(gun)
+                //let s = Gun.node.soul(gun._.put);
+                //console.log(s);
+                //console.log("done!");
             }
             //if(sharetype == "gun"){}
         }());
@@ -135,18 +129,11 @@
                     console.log(tagpub);
                     gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
                 }
-                //gun.put(Gun.obj.put({}, aliaspub, Gun.val.link.ify(aliaspub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                //each.soul=function(data){
-                    //console.log(data);
-                //};
-                //let soulid = Gun.node.soul(gun._.put);
-                //console.log(soulid);
+
+                let s = Gun.node.soul(gun)
+                console.log(s);
+
                 //each.node = function(node, soul){
-                    //console.log("soul",soul)
-                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
-                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
-                //};
-                //each.nodetest = function(node, soul){
                     //console.log("soul",soul)
                     //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
                     //Gun.obj.map(node, each.way, {soul: soul, node: node});
@@ -324,6 +311,7 @@
             if(sharetype == "user"){
                 sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
+                //console.log(sec);
                 if(!sec){
                     console.log("CREATE SHARE KEY!");
                     sec = SEA.random(16).toString();
@@ -334,6 +322,29 @@
                 enc = await SEA.encrypt(data, sec);
                 console.log("enc",enc);
                 gun.put(enc, cb);
+            }
+            //if user is not root graph
+            if(sharetype == "gun"){
+                let countmax = 10;
+                let root;
+                for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+                    let tmp = gun.back(i);//loop to find user root
+                    if(tmp._.soul){
+                        console.log("FOUND SOUL!");
+                        root = tmp;
+                        break;
+                    }
+                }
+                if(root !=null){
+                    let to = root;//user root graph
+                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                    let epub = await to.get('epub').then();
+                    let mix = await SEA.secret(epub, pair);
+                    let key = await SEA.decrypt(enc1, mix);//SECRET
+                    console.log(key);
+                    let enc = await SEA.encrypt(data, key);
+                    gun.put(enc, cb);
+                }
             }
         }());
         return gun;

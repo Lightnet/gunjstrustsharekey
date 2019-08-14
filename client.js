@@ -27,6 +27,11 @@ gun.get('mark').on(function(data, key){
   console.log("update:", data);
   doc.innerText = data.name;
 });
+console.log("test");
+gun.get('~@test').map(function(data,key){
+    console.log("data",data);
+});
+console.log("test");
 
 //===============================================
 // LOGIN / REGISTER
@@ -169,6 +174,8 @@ $("#distrustkey").click(async function(){
 $("#trustlist").click(async function(){
     let user = gun.user();
     user.get('profile').get('alias').trustlist();
+    let a = user.get('profile').get('alias');
+    console.log(a);
 });
 
 $("#putvalue").click(async function(){

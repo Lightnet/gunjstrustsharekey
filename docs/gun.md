@@ -8,3 +8,32 @@
 //
 
 ```
+
+```javascript
+localStorage.clear();
+var gun = Gun();
+
+gun.get('mark').put({
+  name: "Mark",
+  email: "mark@gunDB.io",
+});
+
+gun.get('mark').on(function(data, key){
+  //console.log("update:", data);
+});
+
+let g = gun.get('mark').map().once(function(data, key){
+  //console.log(data)
+  //console.log(key)
+});
+//console.log(g);
+
+g = gun.get('mark');
+let each={}
+each.nodetest = function(node, soul){
+  console.log("node",node);
+  console.log("soul",soul);                  
+};
+console.log(g)
+Gun.obj.map(g._.put, each.nodetest);
+```

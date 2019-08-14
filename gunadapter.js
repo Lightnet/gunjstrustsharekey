@@ -64,6 +64,21 @@
           if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
           Gun.obj.map(node, each.way, {soul: soul, node: node});
         };
+        each.way = function(val, key){
+          var soul = this.soul, node = this.node, tmp;
+          if('_' === key){ return } // ignore meta data
+          if('~@' === soul){  // special case for shared system data, the list of aliases.
+            each.alias(val, key, node, soul); return;
+          }
+          if('~@' === soul.slice(0,2)){ // special case for shared system data, the list of public keys for an alias.
+            each.pubs(val, key, node, soul); return;
+          }
+          if('~' === soul.slice(0,1) && 2 === (tmp = soul.slice(1)).split('.').length){ // special case, account data for a public key.
+            each.pub(val, key, node, soul, tmp, (msg._||noop).user); return;
+          }
+          each.any(val, key, node, soul, (msg._||noop).user); return;
+          return each.end({err: "No other data allowed!"});
+        };
 
         each.alias = function(val, key, node, soul){ // Example: {_:#~@, ~@alice: {#~@alice}}
           if(!val){ return each.end({err: "Data must exist!"}) } // data MUST exist
