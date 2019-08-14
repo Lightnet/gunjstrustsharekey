@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
     <script src="/gunjstrustsharekeyv3.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
+    <script src="/gunadapter.js"></script>
     
     <!--
     <script src="/gun.js" defer></script>
@@ -41,11 +42,12 @@
 
             <br>Profile:<label id="username"></label>
             <br>
-            <br> Public Access Key: <input id="accesskey" /> <label id="lookalias">None</label>
+            <br>Access Public Key: <input id="accesskey" /> <label id="lookalias">None</label>
             <br>Alias: <input id="inputalias" /> 
             <button id="getalias"> Get Value </button> 
             <button id="grantkey"> Grant </button> 
             <button id="revokekey"> Revoke </button>
+            <button id="trustkey"> Trust </button>
             <br>
             <br> Search Public Key:
             <br> <input id="inputsearchpublickey" />

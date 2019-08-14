@@ -1,12 +1,30 @@
 /*
-    Self contain Sandbox Gun Module:
+    Self contain Sandbox Gun Module for auth sea.js:
     Created by: Lightnet
     License: MIT
     Version: 3.0
+    Last Update:2019.08.14
+
     Credit: amark ( https://github.com/amark/gun)
 
+    Information: Work in progress to test dis/trust public key.
+
+    gun functions:
+     * trustkey(to, cb, opt) - writable: allow, public key (not working yet)
+     * distrustkey(to, cb, opt) - writable: denied, public key (not working yet)
+     * grantkey(to, cb, opt) - readable: allow, share key (working for user root)
+     * revokekey(to, cb, opt) - readable: denied, share key (working for user root)
+     * encryptput(data, cb, opt) - encrypt: value (working for user root)
+     * decryptonce( cb, opt) - decrypt: value (working for user root)
+     
+    dis/trust:
+      This deal with owner graph to dis/allow for other users write access.
+
+    grantkey/revokekey:
+     To able to dis/allow user share key access to read data.
+
     Gun Notes:
-     * Work in progress
+     * Work in progress!
      * sea.js and gun.js are buggy with auth checks.
 
 */
@@ -29,25 +47,77 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase ||  gun._.root.opt.sharekeybbase;
+        let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
         }else{
             sharetype = "gun";
         }
+
+        let each = {};
         (async function(){
-
+            //make sure that user root
             if(sharetype == "user"){
+                console.log(gun);
+                //sea.js
+                //line 792
+                //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
+                //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                //let tmp = '~'+pair.pub;
+                //tmp = Gun.val.link.ify(tmp);
+                //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
+                //console.log(tmp);
+                each.soul=function(data){
+                    console.log(data);
+                };
 
+                let soulid = Gun.node.soul(gun._.put);
+                console.log(soulid);
+
+
+
+
+                //each.node = function(node, soul){
+                    //console.log("soul",soul)
+                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
+                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
+                //};
+
+                //each.nodetest = function(node, soul){
+                    //console.log("soul",soul)
+                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
+                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
+                //};
+
+                //Gun.obj.map(gun, each.nodetest);
             }
+            //if(sharetype == "gun"){}
+        }());
+        return gun;
+    }
 
-            if(sharetype == "gun"){
-
-            }
+    function distrustkey(to, cb, opt){
+        console.log("`.distrustkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+        let each = {};
+        (async function(){
 
         }());
         return gun;
@@ -273,6 +343,7 @@
 
     //SETUP FUNCTION for GUN
     Gun.chain.trustkey = trustkey;
+    Gun.chain.distrustkey = distrustkey;
     Gun.chain.grantkey = grantkey;
     Gun.chain.revokekey = revokekey;
     Gun.chain.encryptput = encryptput;

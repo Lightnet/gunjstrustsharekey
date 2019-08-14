@@ -50,7 +50,7 @@ $("#btnlogin").click(function(){
             $("#login").hide();
             $("#profile").show();
             $('#username').text($('#alias').val());
-            user.get('profile').get('alias').decryptvalue(ack=>{
+            user.get('profile').get('alias').decryptonce(ack=>{
                 //console.log(ack);
                 $('#inputalias').val(ack);
             });
@@ -89,7 +89,7 @@ $("#inputalias").keyup(function() {
 
 $("#getalias").click(function(){
     let user = gun.user();
-    user.get('profile').get('alias').decryptvalue(ack=>{
+    user.get('profile').get('alias').decryptonce(ack=>{
         console.log(ack);
     });
 });
@@ -130,6 +130,31 @@ $("#revokekey").click(async function(){
     }
 });
 
+$("#trustkey").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    //if(key.length == 0){
+        //console.log("EMPTY!");
+        //return;
+    //}
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        //user.get('profile').get('alias').revokekey(to);
+        user.get('profile').get('alias').trustkey(to);
+        user.get('profile').get('alias').once((data,key)=>{
+            console.log(data);
+            console.log(key);
+        });
+        //console.log(alias);
+
+    }else{
+        console.log("FAIL");
+    }
+});
+
 $("#accesskey").keyup(async function() {
     let key = $('#accesskey').val();
     if(key.length == 0){
@@ -152,7 +177,8 @@ $("#inputsearchpublickey").keyup(async function() {
     //console.log(to);
     //let name = await to.get('profile').get('alias').then();
     //console.log(name);
-    to.get('profile').get('alias').decryptdata(to,ack=>{
+    //to.get('profile').get('alias').decryptdata(to,ack=>{
+    to.get('profile').get('alias').decryptonce(ack=>{
         console.log(ack)
         $('#dataalias').val(ack);
     },{sharetype:"user",sharekeytype:"path"})
