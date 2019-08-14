@@ -41,6 +41,61 @@
         this.to.next(context);
     });
 
+    function trustlist(to, cb, opt){
+        console.log("`.trustlist` PROTOTYPE API DO NOT USE, TESTING!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+
+        let each = {};
+        (async function(){
+            //make sure that user root
+            if(sharetype == "user"){
+                console.log(gun);
+                //sea.js
+                //line 792
+                //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
+                //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                //let tmp = '~'+pair.pub;
+                //tmp = Gun.val.link.ify(tmp);
+                //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
+                //console.log(tmp);
+
+                //gun.put(Gun.obj.put({}, aliaspub, Gun.val.link.ify(aliaspub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                //each.soul=function(data){
+                    //console.log(data);
+                //};
+
+                //each.node = function(node, soul){
+                    //console.log("soul",soul)
+                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
+                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
+                //};
+                each.nodetest = function(node, soul){
+                    console.log("node",node)
+                    console.log("soul",soul)
+                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
+                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
+                };
+                Gun.obj.map(gun, each.nodetest);
+                console.log("done!");
+            }
+            //if(sharetype == "gun"){}
+        }());
+        return gun;
+    }
+
     function trustkey(to, cb, opt){
         console.log("`.trustkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -71,29 +126,33 @@
                 //tmp = Gun.val.link.ify(tmp);
                 //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
                 //console.log(tmp);
-                each.soul=function(data){
-                    console.log(data);
-                };
 
-                let soulid = Gun.node.soul(gun._.put);
-                console.log(soulid);
-
-
-
-
+                let who = await to.get('alias').then();
+                if(who!=null){
+                    console.log("FOUND!",who);
+                    let pub = await to.get('pub').then();
+                    let tagpub = '~'+pub;
+                    console.log(tagpub);
+                    gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                }
+                //gun.put(Gun.obj.put({}, aliaspub, Gun.val.link.ify(aliaspub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                //each.soul=function(data){
+                    //console.log(data);
+                //};
+                //let soulid = Gun.node.soul(gun._.put);
+                //console.log(soulid);
                 //each.node = function(node, soul){
                     //console.log("soul",soul)
                     //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
                     //Gun.obj.map(node, each.way, {soul: soul, node: node});
                 //};
-
                 //each.nodetest = function(node, soul){
                     //console.log("soul",soul)
                     //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
                     //Gun.obj.map(node, each.way, {soul: soul, node: node});
                 //};
-
                 //Gun.obj.map(gun, each.nodetest);
+                console.log("done!");
             }
             //if(sharetype == "gun"){}
         }());
@@ -348,4 +407,7 @@
     Gun.chain.revokekey = revokekey;
     Gun.chain.encryptput = encryptput;
     Gun.chain.decryptonce = decryptonce;
+    //TESTING...
+    Gun.chain.trustlist = trustlist;
+    
 }());

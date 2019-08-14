@@ -133,26 +133,62 @@ $("#revokekey").click(async function(){
 $("#trustkey").click(async function(){
     let user = gun.user();
     let key = $('#accesskey').val();
-    //if(key.length == 0){
-        //console.log("EMPTY!");
-        //return;
-    //}
+    if(key.length == 0){
+        console.log("EMPTY!");
+        return;
+    }
     let to = gun.user(key);
     let who = await to.get('alias').then();
     //console.log(who);
     if(who != null){
         console.log("PASS");
-        //user.get('profile').get('alias').revokekey(to);
         user.get('profile').get('alias').trustkey(to);
-        user.get('profile').get('alias').once((data,key)=>{
-            console.log(data);
-            console.log(key);
-        });
-        //console.log(alias);
-
     }else{
         console.log("FAIL");
     }
+});
+
+$("#distrustkey").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    if(key.length == 0){
+        console.log("EMPTY!");
+        return;
+    }
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        user.get('profile').get('alias').distrustkey(to);
+    }else{
+        console.log("FAIL");
+    }
+});
+
+$("#trustlist").click(async function(){
+    let user = gun.user();
+    user.get('profile').get('alias').trustlist();
+});
+
+$("#putvalue").click(async function(){
+    let user = gun.user();
+    //user.get('profile').get('alias').trustlist();
+    let key = $('#inputsearchpublickey').val();
+    if(key.length == 0){
+        console.log("EMPTY!");
+        return;
+    }
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        to.get('profile').get('alias').encryptput("to");
+    }else{
+        console.log("FAIL");
+    }
+
 });
 
 $("#accesskey").keyup(async function() {

@@ -43,7 +43,7 @@
         var soul = msg.get['#'];
         //console.log(msg.get);
         if(soul){ // for now, only allow direct IDs to be read.
-          console.log('soul',soul);
+          //console.log('soul',soul);
           if(typeof soul !== 'string'){ return to.next(msg) } // do not handle lexical cursors.
           if('alias' === soul){ // Allow reading the list of usernames/aliases in the system?
             return to.next(msg); // yes.
@@ -57,10 +57,10 @@
       }
 
       if(msg.put){
-        console.log("PUT???");
+        //console.log("PUT???");
         var check = {}, each = {}, u;
         each.node = function(node, soul){
-          console.log("soul",soul)
+          //console.log("soul",soul)
           if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
           Gun.obj.map(node, each.way, {soul: soul, node: node});
         };

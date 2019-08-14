@@ -44,14 +44,16 @@
             <br>
             <br>Access Public Key: <input id="accesskey" /> <label id="lookalias">None</label>
             <br>Alias: <input id="inputalias" /> 
-            <button id="getalias"> Get Value </button> 
-            <button id="grantkey"> Grant </button> 
-            <button id="revokekey"> Revoke </button>
-            <button id="trustkey"> Trust </button>
+            <button id="getalias"> Get Value </button>
+            <button id="grantkey"> Grant (share key) </button> 
+            <button id="revokekey"> Revoke (share key) </button>
+            <button id="trustkey"> Trust (pub key) </button>
+            <button id="distrustkey"> Distrust (pub key) </button>
+            <button id="trustlist"> trust list (pub key) </button>
             <br>
             <br> Search Public Key:
             <br> <input id="inputsearchpublickey" />
-            <br> Alias: <input id="dataalias" />
+            <br> Alias: <input id="dataalias" /><button id="putvalue"> Put? </button>
 
         </div>
         <script src="/client.js" defer></script>
