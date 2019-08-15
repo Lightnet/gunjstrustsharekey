@@ -9,7 +9,9 @@
 
     Status:
      * Work in progress!
+     * Working on trust public key will conflict with share key functions!
      * Work in progress to test dis/trust public key.
+     * encryptput not working to...get(...).encryptput() NO! Mismatched owner on 'ct'. 
 
     Information: This is addon chain to sea.js for user to test functions of acess write and read
     in encryption. It is base on sea.js user functions that is current not improve yet.
@@ -31,10 +33,12 @@
       gun.get('namespace').get('foo').put({SEA{ct:"",iv:"",s:""},~@publickey1,~@publickey2}); //does not work
 
       Example put:
-       * {SEA{ct:"",iv:"",s:""}
+       * ct: "..."
+       * iv: "..."
+       * s: "..."
        * ~@publickey1:{'#': ~@publickey1}
        * ~@publickey2:{'#': ~@publickey2}
-       * _:{}
+       * _:{...}
       To create public key map list that is to need encrypt data and then alias list.
 
       Note: 
@@ -47,6 +51,7 @@
     Gun Notes:
      * sea.js and gun.js are buggy with auth checks.
      * There is a bug in gun.user('publickey') will return as gun not user object.
+     
 
 */
 
