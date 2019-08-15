@@ -24,14 +24,14 @@ gun.get('mark').put({
 
 let doc = document.getElementById('guntext');
 gun.get('mark').on(function(data, key){
-  console.log("update:", data);
+  //console.log("update:", data);
   doc.innerText = data.name;
 });
-console.log("test");
-gun.get('~@test').map(function(data,key){
-    console.log("data",data);
-});
-console.log("test");
+//console.log("test");
+//gun.get('~@test').map(function(data,key){//user
+    //console.log("data",data);
+//});
+//console.log("test");
 
 //===============================================
 // LOGIN / REGISTER
@@ -51,7 +51,7 @@ $("#btnlogin").click(function(){
         if(ack.err){
             console.log(ack.err);
         }else{
-            console.log(ack);
+            //console.log(ack);
             $("#login").hide();
             $("#profile").show();
             $('#username').text($('#alias').val());
@@ -174,8 +174,8 @@ $("#distrustkey").click(async function(){
 $("#trustlist").click(async function(){
     let user = gun.user();
     user.get('profile').get('alias').trustlist();
-    let a = user.get('profile').get('alias');
-    console.log(a);
+    //let a = user.get('profile').get('alias');
+    //console.log(a);
 });
 
 $("#putvalue").click(async function(){

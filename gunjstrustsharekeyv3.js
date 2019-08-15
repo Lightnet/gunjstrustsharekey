@@ -1,13 +1,17 @@
 /*
-    Self contain Sandbox Gun Module for auth sea.js:
+    Self contain Sandbox Gun Module chain for auth sea.js:
     Created by: Lightnet
     License: MIT
     Version: 3.0
-    Last Update:2019.08.14
+    Last Update:2019.08.15
 
     Credit: amark ( https://github.com/amark/gun)
 
-    Information: Work in progress to test dis/trust public key.
+    Status:
+     * Work in progress to test dis/trust public key.
+
+    Information: This is addon chain to sea.js for user to test functions of acess write and read
+    in encryption. It is base on sea.js user functions that is current not improve yet.
 
     gun functions:
      * trustkey(to, cb, opt) - writable: allow, public key (not working yet)
@@ -17,11 +21,27 @@
      * encryptput(data, cb, opt) - encrypt: value (working for user root)
      * decryptonce( cb, opt) - decrypt: value (working for user root)
      
-    dis/trust:
-      This deal with owner graph to dis/allow for other users write access.
+    dis/trustkey:
+      The owner user key graph to dis/allow for other users write access of the value or data.
+
+      The writable key user public key is store in put(data | value) 
+
+      Example:
+      gun.get('namespace').get('foo').put({SEA{ct:"",iv:"",s:""},~@publickey1,~@publickey2}); //does not work
+
+      Example put:
+       * {SEA{ct:"",iv:"",s:""}
+       * ~@publickey1:{'#': ~@publickey1}
+       * ~@publickey2:{'#': ~@publickey2}
+       * _:{}
+      To create public key map list that is to need encrypt data and then alias list.
+
+      Note: 
+       * This part of sea.js function security call/filter check for sea key and alias public keys.
+       * This base on understanding of security node checks.
 
     grantkey/revokekey:
-     To able to dis/allow user share key access to read data.
+     To able to dis/allow user share key access to read data. The share key are store in user trust map key and path.
 
     Gun Notes:
      * Work in progress!
@@ -67,19 +87,21 @@
                 //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
                 //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
                 //let tmp = '~'+pair.pub;
-                gun.map(function(data,key){
-                    console.log(data)
-                    console.log(key)
-                });
-
-                each.nodetest = function(node, soul){
+                //gun.map(function(data,key){
+                    //console.log(data)
+                    //console.log(key)
+                //});
+                let data = await gun.then();
+                console.log(data);
+                //each.nodetest = function(node, soul){
                     //console.log("node",node);
                     //console.log("soul",soul);
                     //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
                     //Gun.obj.map(node, each.way, {soul: soul, node: node});
-                };
+                //};
                 //Gun.obj.map(gun, each.nodetest);
-                Gun.obj.map(gun._.put, each.nodetest);
+                //Gun.obj.map(gun._, each.nodetest);
+                //console.log(gun);
                 //console.log(gun)
                 //let s = Gun.node.soul(gun._.put);
                 //console.log(s);
@@ -125,12 +147,18 @@
                 if(who!=null){
                     console.log("FOUND!",who);
                     let pub = await to.get('pub').then();
-                    let tagpub = '~'+pub;
-                    console.log(tagpub);
-                    gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                    let sec = await gun.then();
+                    console.log(sec);
+                    //let tagpub = '~'+pub;
+                    let tagpub = '~@'+pub;
+                    //console.log(tagpub);
+                    //gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub)));
+                    gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
+                    //gun.back().put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
+                    console.log(gun.back());
                 }
 
-                let s = Gun.node.soul(gun)
+                let s = Gun.node.soul(gun._)
                 console.log(s);
 
                 //each.node = function(node, soul){
@@ -320,8 +348,42 @@
                     user.get('trust').get(pair.pub).get(path).put(enc);
                 }
                 enc = await SEA.encrypt(data, sec);
-                console.log("enc",enc);
-                gun.put(enc, cb);
+
+                let enc2 = await gun.then();
+                // value enc and public keys from current gun graph
+                if("SEA" == enc.slice(0,3)){
+                    //console.log('FOUND!');
+                    enc = enc.substring(3, enc.length);
+                    enc = JSON.parse(enc)
+                    //console.log(enc);
+                }
+                //need to be convert into array not string 'SEA{...}' > {...}
+                let tmpp=enc;//json object
+                //need to rework later
+                for(o in enc2){
+                    //console.log(o);
+                    if(o == "ct"){
+                    }else if (o == "iv"){//ignore
+                    }else if(o == "s"){//ignore
+                    }else if(o == '_'){//ignore
+                    }else{
+                        if("~@" == o.slice(0,2)){
+                            console.log("FOUND PUB KEY");
+                            let tmppub = o;
+                            console.log(tmppub);
+                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                            console.log(tmpp);
+                        }
+                    }
+                }
+                //console.log(enc2[0]);
+                //console.log(objp);
+                //console.log(tmpp);
+                //gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
+                gun.put(tmpp, cb);
+
+                //console.log("enc",enc);
+                //gun.put(enc, cb);
             }
             //if user is not root graph
             if(sharetype == "gun"){
@@ -355,7 +417,7 @@
         cb = cb || function(ctx) { return ctx };
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
-        console.log(user);
+        //console.log(user);
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
         let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
         let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
@@ -368,7 +430,7 @@
             sharetype = "gun";
         }
         (async function(){
-            console.log(sharetype);
+            //console.log(sharetype);
             if(sharetype == "user"){
                 let sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);

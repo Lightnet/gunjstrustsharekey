@@ -66,14 +66,19 @@
         };
         each.way = function(val, key){
           var soul = this.soul, node = this.node, tmp;
+          //console.log(soul);
           if('_' === key){ return } // ignore meta data
           if('~@' === soul){  // special case for shared system data, the list of aliases.
+            console.log(soul);
             each.alias(val, key, node, soul); return;
           }
+          
           if('~@' === soul.slice(0,2)){ // special case for shared system data, the list of public keys for an alias.
+            console.log(soul);
             each.pubs(val, key, node, soul); return;
           }
           if('~' === soul.slice(0,1) && 2 === (tmp = soul.slice(1)).split('.').length){ // special case, account data for a public key.
+            console.log(soul);
             each.pub(val, key, node, soul, tmp, (msg._||noop).user); return;
           }
           each.any(val, key, node, soul, (msg._||noop).user); return;
