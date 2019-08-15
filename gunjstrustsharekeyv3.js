@@ -8,18 +8,19 @@
     Credit: amark ( https://github.com/amark/gun)
 
     Status:
+     * Work in progress!
      * Work in progress to test dis/trust public key.
 
     Information: This is addon chain to sea.js for user to test functions of acess write and read
     in encryption. It is base on sea.js user functions that is current not improve yet.
 
     gun functions:
-     * trustkey(to, cb, opt) - writable: allow, public key (not working yet)
-     * distrustkey(to, cb, opt) - writable: denied, public key (not working yet)
+     * trustkey(to, cb, opt) - writable: allow, public key (work in progress)
+     * distrustkey(to, cb, opt) - writable: denied, public key (work in progress)
      * grantkey(to, cb, opt) - readable: allow, share key (working for user root)
-     * revokekey(to, cb, opt) - readable: denied, share key (working for user root)
-     * encryptput(data, cb, opt) - encrypt: value (working for user root)
-     * decryptonce( cb, opt) - decrypt: value (working for user root)
+     * revokekey(to, cb, opt) - readable: denied, share key (working for user root / work in progress trust key)
+     * encryptput(data, cb, opt) - encrypt: value (working for user root / work in progress trust key)
+     * decryptonce( cb, opt) - decrypt: value (working for user root / work in progress trust key)
      
     dis/trustkey:
       The owner user key graph to dis/allow for other users write access of the value or data.
@@ -44,8 +45,8 @@
      To able to dis/allow user share key access to read data. The share key are store in user trust map key and path.
 
     Gun Notes:
-     * Work in progress!
      * sea.js and gun.js are buggy with auth checks.
+     * There is a bug in gun.user('publickey') will return as gun not user object.
 
 */
 
@@ -81,31 +82,8 @@
         (async function(){
             //make sure that user root
             if(sharetype == "user"){
-                //console.log(gun);
-                //sea.js
-                //line 792
-                //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
-                //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                //let tmp = '~'+pair.pub;
-                //gun.map(function(data,key){
-                    //console.log(data)
-                    //console.log(key)
-                //});
                 let data = await gun.then();
                 console.log(data);
-                //each.nodetest = function(node, soul){
-                    //console.log("node",node);
-                    //console.log("soul",soul);
-                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
-                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
-                //};
-                //Gun.obj.map(gun, each.nodetest);
-                //Gun.obj.map(gun._, each.nodetest);
-                //console.log(gun);
-                //console.log(gun)
-                //let s = Gun.node.soul(gun._.put);
-                //console.log(s);
-                //console.log("done!");
             }
             //if(sharetype == "gun"){}
         }());
@@ -133,7 +111,7 @@
         (async function(){
             //make sure that user root
             if(sharetype == "user"){
-                console.log(gun);
+                //console.log(gun);
                 //sea.js
                 //line 792
                 //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
@@ -155,18 +133,8 @@
                     //gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub)));
                     gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
                     //gun.back().put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                    console.log(gun.back());
+                    //console.log(gun.back());
                 }
-
-                let s = Gun.node.soul(gun._)
-                console.log(s);
-
-                //each.node = function(node, soul){
-                    //console.log("soul",soul)
-                    //if(Gun.obj.empty(node, '_')){ return check['node'+soul] = 0 } // ignore empty updates, don't reject them.
-                    //Gun.obj.map(node, each.way, {soul: soul, node: node});
-                //};
-                //Gun.obj.map(gun, each.nodetest);
                 console.log("done!");
             }
             //if(sharetype == "gun"){}
@@ -192,7 +160,49 @@
         }
         let each = {};
         (async function(){
+            if(sharetype == "user"){
+                let who = await to.get('alias').then();
+                if(who!=null){
+                    console.log("FOUND!",who);
+                    let pub = await to.get('pub').then();
+                    let enc1 = await gun.then();//value
+                    let tagpub = "~@"+pub;//PUBLIC KEY MATCH FOR DISTRUST LIST
+                    //ENC VALUE AND ALIAS KEYS
+                    let sec = await user.get('trust').get(pair.pub).get(path).then();
+                    sec = await SEA.decrypt(sec, pair);
+                    //console.log(sec);
+                    //DECRYPT VALUE
+                    let gvalue = await SEA.decrypt(enc1, sec);
+                    gun.put(gvalue, cb);//reset to clear map list else it will not revoke public key
+                    //console.log(value);
+                    //ENCRYPT VALUE
+                    gvalue = await SEA.encrypt(gvalue, sec);
+                    //console.log(typeof value);
+                    if((typeof gvalue != 'object') && ("SEA" == gvalue.slice(0,3)) ){
+                        //console.log('FOUND!');
+                        gvalue = gvalue.substring(3, gvalue.length);
+                        gvalue = JSON.parse(gvalue)
+                        //console.log(enc);
+                    }
+                    let tmpp=gvalue;//json object
+                    for(o in enc1){
+                        if("~@" == o.slice(0,2)){//check if public key tag
+                            let tmppub = o;
+                            if(tmppub == tagpub){//revoke to skip public key
+                                //console.log("FOUND REVOKE!");
+                            }else{
+                                tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                            }
+                        }
+                    }
+                    //console.log(tmpp);
+                    gun.put(tmpp, cb);
+                }
+            }
 
+            if(sharetype == "gun"){
+
+            }
         }());
         return gun;
     }
@@ -376,12 +386,7 @@
                         }
                     }
                 }
-                //console.log(enc2[0]);
-                //console.log(objp);
-                //console.log(tmpp);
-                //gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
                 gun.put(tmpp, cb);
-
                 //console.log("enc",enc);
                 //gun.put(enc, cb);
             }
@@ -404,8 +409,32 @@
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);//SECRET
                     console.log(key);
-                    let enc = await SEA.encrypt(data, key);
-                    gun.put(enc, cb);
+                    //GET VALUE AND SHARE KEYS
+                    let enc2 = await gun.then();
+                    console.log(enc2);
+                    //ENCRYPT VALUE
+                    let enc3 = await SEA.encrypt(data, key);
+                    //STRING TO JSON OBJECT
+                    if("SEA" == enc3.slice(0,3)){
+                        //console.log('FOUND!');
+                        enc3 = enc3.substring(3, enc3.length);
+                        enc3 = JSON.parse(enc3)
+                    }
+                    console.log(enc3);
+                    let tmpp=enc3;
+                    //LIST PUBLIC KEYS TO ADD NEW MAP LIST
+                    for(o in enc2){
+                        if("~@" == o.slice(0,2)){
+                            //console.log("FOUND PUB KEY");
+                            let tmppub = o;
+                            //console.log(tmppub);
+                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                            //console.log(tmpp);
+                        }
+                    }
+                    console.log(tmpp);
+                    gun.put(tmpp, cb);
+                    //gun.put(enc, cb);
                 }
             }
         }());
@@ -465,7 +494,7 @@
                     let enc2 = await gun.then();
                     //enc2 = "SEA"+ JSON.stringify(enc2);
                     let value = await SEA.decrypt(enc2, key);
-                    console.log(value);
+                    //console.log(value);
                     cb(value);
                 }
             }
