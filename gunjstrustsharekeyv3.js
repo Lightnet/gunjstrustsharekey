@@ -132,11 +132,29 @@
                     let pub = await to.get('pub').then();
                     let sec = await gun.then();
                     console.log(sec);
+                    
+                    //let tagalias = '~@'+who;
+                    //sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
+                    let tagpub = '~'+pub;
+                    sec = Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
+
+                    // ALIAS LIST?
+                    //let test=Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub));
+                    //let tagwho = "~@"+who;
+                    //let test=Gun.obj.put({}, tagwho, Gun.val.link.ify(tagwho));
+                    //let tmp = {};
+                    //sec = Gun.obj.put(sec, '~@', test);
+                    //console.log(sec);
+
+                    gun.put(sec,cb);
                     //let tagpub = '~'+pub;
-                    let tagpub = '~@'+pub;
+                    //let tagpub = '~@'+pub;
+                    //let tagpub = '~@'+who;
+                    //let tagpub = '~'+who;
+                    //let tagpub = '~'+pub;
                     //console.log(tagpub);
                     //gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub)));
-                    gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
+                    //gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
                     //gun.back().put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
                     //console.log(gun.back());
                 }
@@ -378,6 +396,7 @@
                 //need to rework later
                 for(o in enc2){
                     //console.log(o);
+                    /*
                     if(o == "ct"){
                     }else if (o == "iv"){//ignore
                     }else if(o == "s"){//ignore
@@ -390,6 +409,14 @@
                             tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
                             console.log(tmpp);
                         }
+                    }
+                    */
+                    if("~" == o.slice(0,1)){
+                        console.log("FOUND PUB KEY");
+                        let tmppub = o;
+                        console.log(tmppub);
+                        tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                        console.log(tmpp);
                     }
                 }
                 gun.put(tmpp, cb);
@@ -433,7 +460,16 @@
                     let tmpp=enc3;
                     //LIST PUBLIC KEYS TO ADD NEW MAP LIST
                     for(o in enc2){
+                        /*
                         if("~@" == o.slice(0,2)){
+                            //console.log("FOUND PUB KEY");
+                            let tmppub = o;
+                            //console.log(tmppub);
+                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                            //console.log(tmpp);
+                        }
+                        */
+                        if("~" == o.slice(0,1)){
                             //console.log("FOUND PUB KEY");
                             let tmppub = o;
                             //console.log(tmppub);
@@ -474,6 +510,15 @@
                 sec = await SEA.decrypt(sec, pair);
                 let key = await gun.then();
                 console.log(key)
+                if(key === undefined){
+                    //console.log("FOUND NULL");
+                    cb(undefined);
+                    return gun;
+                }
+                if(key.sea === undefined){
+                    cb(null);
+                    return gun;
+                }
                 key = key.sea;//TESTING....
                 let value = await SEA.decrypt(key, sec);
                 cb(value);
