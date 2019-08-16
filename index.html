@@ -23,13 +23,20 @@
   </head>
   <body>
     <main>
-      <labe>Nodejs http with Gun.js</labe>
+      <label>Nodejs http with Gun.js</label>
       <div id="guntext">
         ...
       </div>
-
       <button id="btngun">Gun</button>
       <button id="btnuser">User</button>
+      <div id="navmenu">
+        <button id="btnprofile"> Profile </button>
+        <button id="btnchangepassphrase"> Change Passphrase </button>
+        <button id="btnpassphrase"> Passphrase Hint </button>
+        <button id="btnmessage"> Messages </button>
+        <button id="btnchat"> Chat </button>
+      </div>
+      
         <div id="login">
             Alias:<input id="alias" value="test" />
             Passphrase:<input id="passphrase" value="test" />
@@ -56,6 +63,28 @@
             <br> Alias: <input id="dataalias" /><button id="putvalue"> Put? </button>
 
         </div>
+
+        <div id="changepassphrase">
+          Old Passphrase:<input id="oldpassphrase" value="test" />
+          <br>New Passphrase:<input id="newpassphrase" value="test" />
+          <br><button id="btnchangepassphraseapply"> Apply </button>
+        </div>
+
+        <div id="passphrasehint">
+          Question 1:<input id="question1" value="test" />
+          <br>Question 2:<input id="question2" value="test" />
+          <br>Hint:<input id="hint" value="test" />
+          <br><button id="btnapplypassphrase"> Apply </button>
+        </div>
+
+        <div id="messages">
+          messages
+        </div>
+
+        <div id="chat">
+          chat
+        </div>
+
         <script src="/client.js" defer></script>
 
     </main>

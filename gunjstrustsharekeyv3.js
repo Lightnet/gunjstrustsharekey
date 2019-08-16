@@ -366,12 +366,13 @@
 
                 let enc2 = await gun.then();
                 // value enc and public keys from current gun graph
-                if("SEA" == enc.slice(0,3)){
+                //if("SEA" == enc.slice(0,3)){
                     //console.log('FOUND!');
-                    enc = enc.substring(3, enc.length);
-                    enc = JSON.parse(enc)
+                    //enc = enc.substring(3, enc.length);
+                    //enc = JSON.parse(enc)
                     //console.log(enc);
-                }
+                //}
+                enc={sea:enc};
                 //need to be convert into array not string 'SEA{...}' > {...}
                 let tmpp=enc;//json object
                 //need to rework later
@@ -420,11 +421,14 @@
                     //ENCRYPT VALUE
                     let enc3 = await SEA.encrypt(data, key);
                     //STRING TO JSON OBJECT
+                    /*
                     if("SEA" == enc3.slice(0,3)){
                         //console.log('FOUND!');
                         enc3 = enc3.substring(3, enc3.length);
                         enc3 = JSON.parse(enc3)
                     }
+                    */
+                    enc3={sea:enc3}
                     console.log(enc3);
                     let tmpp=enc3;
                     //LIST PUBLIC KEYS TO ADD NEW MAP LIST
@@ -469,6 +473,8 @@
                 let sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 let key = await gun.then();
+                console.log(key)
+                key = key.sea;//TESTING....
                 let value = await SEA.decrypt(key, sec);
                 cb(value);
             }
@@ -497,6 +503,9 @@
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);
                     let enc2 = await gun.then();
+                    console.log(enc2);
+                    enc2 = enc2.sea;//TESTING....
+                    console.log(enc2);
                     //enc2 = "SEA"+ JSON.stringify(enc2);
                     let value = await SEA.decrypt(enc2, key);
                     //console.log(value);

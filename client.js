@@ -60,6 +60,7 @@ $("#btnlogin").click(function(){
                 $('#inputalias').val(ack);
             });
             $('#aliaspublickey').val(ack.sea.pub);
+            $("#navmenu").show();
         }
     });
 });
@@ -77,8 +78,6 @@ $("#btnregister").click(function(){
 
 //===============================================
 // PROFILE
-
-$("#profile").hide();
 
 $('#copypublickey').click(function(){
     $('#aliaspublickey').select();
@@ -226,3 +225,68 @@ $("#inputsearchpublickey").keyup(async function() {
         $('#dataalias').val(ack);
     },{sharetype:"user",sharekeytype:"path"})
 });
+
+//===============================================
+// BUTTON NAV MENU
+function hidediv(){
+    $("#profile").hide();
+    $("#changepassphrase").hide();
+    $("#passphrasehint").hide();
+    $("#messages").hide();
+    $("#chat").hide();
+    //$("#navmenu").hide();
+}
+
+$('#btnprofile').click(function(){
+    hidediv();
+    $("#profile").show();
+});
+
+$('#btnchangepassphrase').click(function(){
+    hidediv();
+    $("#changepassphrase").show();
+});
+
+$('#btnpassphrase').click(function(){
+    hidediv();
+    $("#passphrasehint").show();
+});
+
+$('#btnmessage').click(function(){
+    hidediv();
+    $("#messages").show();
+});
+
+$('#btnchat').click(function(){
+    hidediv();
+    $("#chat").show();
+});
+
+
+//===============================================
+// CHANGE PASSPHRASE
+
+$('#btnchangepassphraseapply').click(function(){
+    let user = gun.user();
+
+    //$('#oldpassphrase').val();
+
+    console.log("btnchangepassphraseapply")
+});
+
+//===============================================
+// PASSPHRASE HINT
+$('#btnapplypassphrase').click(function(){
+    console.log("btnapplypassphrase")
+});
+
+//===============================================
+// 
+
+
+//===============================================
+// 
+
+
+hidediv();
+$("#navmenu").hide();
