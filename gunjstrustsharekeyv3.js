@@ -3,7 +3,7 @@
     Created by: Lightnet
     License: MIT
     Version: 3.0
-    Last Update:2019.08.15
+    Last Update:2019.08.16
 
     Credit: amark ( https://github.com/amark/gun)
 
@@ -32,10 +32,8 @@
       Example:
       gun.get('namespace').get('foo').put({SEA{ct:"",iv:"",s:""},~@publickey1,~@publickey2}); //does not work
 
-      Example put:
-       * ct: "..."
-       * iv: "..."
-       * s: "..."
+      Example put:(work in progress might not work)
+       * sea: "SEA{ct: "...",iv: "...",s: "..."}}"
        * ~@publickey1:{'#': ~@publickey1}
        * ~@publickey2:{'#': ~@publickey2}
        * _:{...}
@@ -137,6 +135,7 @@
                     //sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
                     let tagpub = '~'+pub;
                     sec = Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
+                    //Example: {_:#~asdf, hello:'world'~fdsa}}
 
                     // ALIAS LIST?
                     //let test=Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub));
@@ -447,6 +446,49 @@
                     console.log(enc2);
                     //ENCRYPT VALUE
                     let enc3 = await SEA.encrypt(data, key);
+                    let tmpp={}
+                    //let tmpp=enc2;
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+"~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "~" +pair.pub, enc3+"~" +pair.pub);
+                    //enc3 = {sea:enc3+"~" +pair.pub};//
+                    enc3 = enc3+"~"+pair.pub;//
+                    //enc3 = {alias:{sea:enc3}};//
+                    //enc3 = {alias:{sea:enc3+"~"+pair.pub}};//
+                    //enc3 = {sea:enc3};//
+                    //enc3 = {sea:enc3+"~" +pair.pub};//
+                    //enc3 = Gun.obj.put(tmpp, "~"+'alias', enc3+"~"+pair.pub);
+                    //NO! Mismatched owner on '~ZjOFw8Lfjqxf2BEDAOAfAIv4haYyIJ8DQZphL3Zgrgw.Z0cXaDKwGmd0ab0a-DvqOl5vyW8zKUrLlEbulncDdiM'. 
+                    console.log(enc3);
+                    gun.put(enc3, cb);
+                    //gun.put({}, cb);//odd work but bug!
+
+                    //let name = await user.get('alias').then();
+                    //enc3 = Gun.obj.put(enc2, name, enc3+ "~" +pair.pub);
+                    //console.log(enc3)
+                    //gun.put(enc3, cb);
+
+                    //let tmpp={}
+                    //let name = await user.get('alias').then();
+                    //enc3 = Gun.obj.put(tmpp, "~" +pair.pub, enc3+ "~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "~@"+name, enc3+ "~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3);
+                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+"~" +pair.pub);
+                    //for(o in enc2){
+                        //if("~" == o.slice(0,1)){
+                            //let tmppub = o;
+                            //tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                        //}
+                    //}
+                    //console.log(tmpp);
+                    //gun.put(tmpp, cb);
+
+
+
+
+
                     //STRING TO JSON OBJECT
                     /*
                     if("SEA" == enc3.slice(0,3)){
@@ -455,20 +497,17 @@
                         enc3 = JSON.parse(enc3)
                     }
                     */
-                    enc3={sea:enc3}
-                    console.log(enc3);
-                    let tmpp=enc3;
-                    //LIST PUBLIC KEYS TO ADD NEW MAP LIST
+                    //let tmpp=enc3;
+                    //let tmpp={}
+                    //let name = await user.get('alias').then();
+                    //tmpp = Gun.obj.put(tmpp, name, enc3+ "~" +pair.pub);
+                    //enc3={sea:enc3}
+                    //Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
+                    //enc2 = Gun.obj.put(enc2, name, enc3+ "~" +pair.pub);
+                    //enc2 = Gun.obj.put(enc2, sea, enc3+ "~" +pair.pub);
+                    //console.log(tmpp);
+                    /*
                     for(o in enc2){
-                        /*
-                        if("~@" == o.slice(0,2)){
-                            //console.log("FOUND PUB KEY");
-                            let tmppub = o;
-                            //console.log(tmppub);
-                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                            //console.log(tmpp);
-                        }
-                        */
                         if("~" == o.slice(0,1)){
                             //console.log("FOUND PUB KEY");
                             let tmppub = o;
@@ -477,8 +516,11 @@
                             //console.log(tmpp);
                         }
                     }
-                    console.log(tmpp);
-                    gun.put(tmpp, cb);
+                    */
+
+                    //console.log(tmpp);
+                    //gun.put(enc2, cb);
+                    //gun.put(tmpp, cb);
                     //gun.put(enc, cb);
                 }
             }

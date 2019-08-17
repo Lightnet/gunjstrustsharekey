@@ -1,6 +1,26 @@
 @Lightnet it is this dense code here: https://github.com/amark/gun/blob/master/sea.js#L1143-L1260 , basically each put operation is passed through a series functions that analyze each graph/node/key/value to make sure they are cryptographically valid. If anything is not correct, it acts as a firewall and rejects the data, else it to.next(msg) it into the next middleware adapters. Does this answer your question?
 
 
+
+```
+@Lightnet it looks like the owner is ~9-G... but user ~PVO... is trying to write to it.
+Just to make sure I haven't confused you or others about the base algorithm for this, remember that:
+
+Alice cannot actually write data on Bob's graph. (This would require a data-dependent wire adapter running on every peer, which does not scale)
+So what we do is Alice writes to her graph that Bob is a collaborator.
+THEN we load Bob's edit from Bob's graph and merge it ON SCREEN with Alice's data from her graph.
+Their data is not actually merged at the storage or wire layer.
+This will only work for less than X number of users. For larger than X number of users, a modified approach is needed.
+
+@Lightnet it is the 3rd one ~ but again take note of my comments above, doing it at the wire adapter may not be very interoperable across peers.
+```
+
+```
+
+```
+
+
+
 ```javascript
 ct: "..."
 iv: "..."

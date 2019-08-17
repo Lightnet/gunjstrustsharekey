@@ -8,9 +8,15 @@ root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next u
 ```
 
 ```javascript
+@Lightnet all data yeah is signed with some special stuff, the (1) (2) (3) organization has to do with handling special namespaces in GUN's universal graph.
 
 ```
 
 ```javascript
-
+ GUN has storage adapters for plain files, redis, S3, etc., as long as there are multiple peers connected in the network, GUN will retrieve from multiple machines (even browsers!) directly OR indirectly (daisy chain). So honestly, it doesn't really matter if some of those machines use S3 or not, I don't consider this a problem - this would only be a problem if ALL the machines use S3.
+lol, I'm sure it would be easy to add an adapter for some blockchain stuff to, but they're just so slow they'll likely be dropped by DAM (the daisy chain system) because other peers that respond faster.
+DAM has this cool internal deduplication mechanism, that if 2 peers in the daisy happen to both reply with the same data, it only chooses the fastest.
+TBH, though it might sound tacky, this algorithm was inspired by photon's particle behavior in quantum mechanics.
+super old talk of mine on this: https://youtu.be/5BuoDqVxvOM
+BBL
 ```
