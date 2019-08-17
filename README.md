@@ -1,31 +1,34 @@
 # gunjstrustsharekey
 
-# Create by: Lightnet
+## Create by: Lightnet
 
-# Credit:
+## Credit:
  * Amark (https://github.com/amark/gun)
 
-# License: MIT
+## License: MIT
 
-# Status:
- * Work in progress. 
- * User function trust (unknown).
-
-# Information:
- This is just helper share key setup call functions. To grant and revoke users access.
- As well put encrypt and decrypt key value as well other users. To learn how SEA.js 
- (Security Encryption Authorization ) that works with gun.js.
-
- * https://gun.eco/docs/SEA
- 
-Working Javascript: 
+## Status:
+ * User function dis/trust (work in progress).
  * Nodejs (Not working atm)
  * Browser (Working)
  * v3 work in progress.
 
-# Features: 
+## To Do List:
+ * Debug and errors check keys.
+ * Need detail Docs.
+ * Clean Up script.
+
+## Information:
+ This is just Gun chain share key, trust writable key, and encryption setup functions. To grant and revoke owner user key graph for users access to able to read data value for share key access. To used share key to write encrypt data for other can only read. The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value. As well encryptput and decryptonce key value to encode and decode owner as well other user but permission access read and write.
+ 
+ To learn how SEA.js 
+ (Security Encryption Authorization ) that works with gun.js.
+
+ * https://gun.eco/docs/SEA
+
+## Features: 
 ```
-User / Gun:
+User / Gun functions:
  - function grantkey (to allow owner user access to key graph value for other users. Check and create salt keys)
  - function revokekey (to owner revoke user access to key graph for user. Note it will break salt key if share with other users.)
   - Recreate new slat key and reencrypt value.(This break other salt keys are shared.)
@@ -36,13 +39,7 @@ User / Gun:
  - function decryptonce (v3) (to allow other user to decrypt key value/data from user not gun.get('namespace'))
 ```
 
-# To Do List:
- * Debug and errors check keys.
- * Work on debug logging.
- * Finish and Docs.
- * Clean Up script.
-
-# Design & Guide:
+## Design & Guide:
  gun.js is database graph. By using namespace graph to check type object. That is need to create unique key or id on namespace root graph to identify as json object.
 
  ```javascript
@@ -113,8 +110,8 @@ User / Gun:
   user.get('profile').put({foo:"bar"});
  ```
 
-## Map
- gun has simalar to javascript object when getting key and value
+## Map/List
+ gun has simalar to javascript object when getting key and value.
 
 ```javascript
 var o={foo:"bar"}; //json object
