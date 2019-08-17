@@ -2,6 +2,7 @@ var fs = require("fs");
 var path = require("path");
 const http = require("http");
 const Gun = require("gun");
+require("gun/sea");//note make sure python 2.7 is install to work.
 var { PORT = 8080, NODE_ENV } = process.env;
 const dev = NODE_ENV === "development";
 console.log("dev: " + dev);

@@ -8,7 +8,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- import the webpage's stylesheet -->
-    <!--<link rel="stylesheet" href="/style.css">-->
+    <link rel="stylesheet" href="/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
@@ -17,9 +17,6 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
     <script src="/gunadapter.js"></script>
     
-    <!--
-    <script src="/gun.js" defer></script>
-    -->
   </head>
   <body>
     <main>
@@ -29,6 +26,7 @@
       </div>
       <button id="btngun">Gun</button>
       <button id="btnuser">User</button>
+      <!--<button id="btnshowmodal">Modal</button>-->
       <div id="navmenu">
         <button id="btnprofile"> Profile </button>
         <button id="btnchangepassphrase"> Change Passphrase </button>
@@ -41,7 +39,17 @@
             Alias:<input id="alias" value="test" />
             Passphrase:<input id="passphrase" value="test" />
             <button id="btnlogin">Login</button>
+            <button id="btnforgot">Forgot</button>
             <button id="btnregister">Register</button>
+        </div>
+
+        <div id="forgot">
+            Alias:<input id="falias" value="test" />
+            <br>Question 1:<input id="fquestion1" value="test" />
+            <br>Question 2:<input id="fquestion2" value="test" />
+            <br>Hint:<input id="fhint" value="test" />
+            <br><button id="btnforgothint">Get Hint</button>
+            <button id="btnbacklogin">Cancel</button>
         </div>
 
         <div id="profile">
@@ -71,10 +79,11 @@
         </div>
 
         <div id="passphrasehint">
-          Question 1:<input id="question1" value="test" />
-          <br>Question 2:<input id="question2" value="test" />
-          <br>Hint:<input id="hint" value="test" />
-          <br><button id="btnapplypassphrase"> Apply </button>
+          Question 1:<input id="question1" value="" />
+          <br>Question 2:<input id="question2" value="" />
+          <br>Hint:<input id="hint" value="" />
+          <br><button id="btnapplypassphrasehint"> Apply </button>
+          <button id="btngetpassphrasehint"> Get Hint </button>
         </div>
 
         <div id="messages">
@@ -85,8 +94,14 @@
           chat
         </div>
 
+        <div id="Modal" class="modal">
+          <div id="dialog" class="modal-content">
+            <p>Message:<label id="dialogmessage">None</label></p>
+            <button id="btndialogokay">Okay</button>
+          </div>
+        </div>
+        
         <script src="/client.js" defer></script>
-
     </main>
     <footer>
     </footer>
