@@ -26,8 +26,8 @@
 
  * https://gun.eco/docs/SEA
 
-## Features: 
-```
+## Gun chain Features: 
+
 User / Gun functions:
  - function grantkey (to allow owner user access to key graph value for other users. Check and create salt keys)
  - function revokekey (to owner revoke user access to key graph for user. Note it will break salt key if share with other users.)
@@ -37,7 +37,18 @@ User / Gun functions:
  - function decryptdata (to allow other user to decrypt key value/data from gun or sea but not self)
   - `let to = gun.user(public key)`
  - function decryptonce (v3) (to allow other user to decrypt key value/data from user not gun.get('namespace'))
-```
+
+
+## Http server features:
+ * Note sea.js is used encryption functions as well base user access graph.
+ * Profile to create/edit alias name to encrypt string example.
+ * Forgot passphrase hint example.
+ * Add/remove contacts example.
+ * Private message encrypt example.
+ * Public Chat encrypt example.
+ * Change passphrase example.
+ * Passphrase hint example.
+ * Private Chat example. (Not build)
 
 ## Design & Guide:
  gun.js is database graph. By using namespace graph to check type object. That is need to create unique key or id on namespace root graph to identify as json object.
