@@ -19,9 +19,8 @@
     
   </head>
   <body>
-    <main>
       <label>Nodejs http with Gun.js</label>
-      <div id="guntext">...</div>
+      <label id="guntext">...</label>
       <button id="btngun">Gun</button>
       <button id="btnuser">User</button>
       <!--<button id="btnshowmodal">Modal</button>-->
@@ -30,7 +29,8 @@
         <button id="btnchangepassphrase"> Change Passphrase </button>
         <button id="btnpassphrase"> Passphrase Hint </button>
         <button id="btnmessage"> Messages </button>
-        <button id="btnchat"> Chat </button>
+        <button id="btnpublicchat"> Public Chat </button>
+        <button id="btnprivatechat"> Private Chat </button>
       </div>
       
         <div id="login">
@@ -87,12 +87,30 @@
           <button id="btngetpassphrasehint"> Get Hint </button>
         </div>
 
-        <div id="messages">
-          messages
+        <div id="messages" style="height:100%;width:100%;">
+          <div id="messagesdiv" style="height:22px;width:100%;">
+            <select id="usercontacts">
+              <option selected disabled>-- Select User --</option>
+            </select>
+            <label>Public Key:</label><input id="mpublickey" value="" />
+            <button id="btnadduser">+</button>
+            <button id="btnremoveuser">-</button>
+            <label id="mwho">who?</label>
+          </div>
+          <div id="messagelist" style="background-color: darkgray;">
+            Test
+          </div>
+          <div id="messageinputarea"style="height:22px;width:100%">
+            <input id="inputmessagechat" value="ss">
+          </div>
         </div>
 
-        <div id="chat">
-          chat
+        <div id="publicchat">
+          publicchat
+        </div>
+
+        <div id="privatechat">
+          privatechat
         </div>
 
         <div id="Modal" class="modal">
@@ -103,7 +121,6 @@
         </div>
         
         <script src="/client.js" defer></script>
-    </main>
     <footer>
     </footer>
   </body>

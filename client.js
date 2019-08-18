@@ -71,13 +71,15 @@ $("#btnlogin").click(function(){
             //console.log(ack);
             //modalmessage(ack);
             $("#login").hide();
-            $("#profile").show();
+            //$("#profile").show();
+            $("#messages").show();
             $('#username').text($('#alias').val());
             user.get('profile').get('alias').decryptonce(ack=>{//get user profile alias key for value
                 //console.log(ack);
                 $('#inputalias').val(ack);
             });
             $('#aliaspublickey').val(ack.sea.pub);
+            updateContacts();
             $("#navmenu").show();
         }
     });
@@ -268,7 +270,8 @@ function hidediv(){
     $("#changepassphrase").hide();
     $("#passphrasehint").hide();
     $("#messages").hide();
-    $("#chat").hide();
+    $("#publicchat").hide();
+    $("#privatechat").hide();
 }
 $('#btnprofile').click(function(){
     hidediv();
@@ -286,9 +289,13 @@ $('#btnmessage').click(function(){
     hidediv();
     $("#messages").show();
 });
-$('#btnchat').click(function(){
+$('#btnpublicchat').click(function(){
     hidediv();
-    $("#chat").show();
+    $("#publicchat").show();
+});
+$('#btnprivatechat').click(function(){
+    hidediv();
+    $("#privatechat").show();
 });
 //===============================================
 // CHANGE PASSPHRASE
@@ -350,9 +357,158 @@ $('#btngetpassphrasehint').click(async function(){
     $('#hint').val(hint);
 });
 //===============================================
-// 
+// MESSAGES
+$('#btnadduser').click(async function(){
+    let publickey = ($('#mpublickey').val() || '').trim();
+    if(!publickey){console.log("Public Key EMPTY!");return;}
+    let user = gun.user();
+    let to = gun.user(publickey);//get alias
+    let who = await to.then() || {};//get alias data
+    if(!who.alias){console.log("No Alias!");return;}
+    user.get("contacts").get(publickey).put({alias:who.alias});
+    updateContacts();
+});
+$('#btnremoveuser').click(async function(){
+    let publickey = ($('#mpublickey').val() || '').trim();
+    if(!publickey){console.log("Public Key EMPTY!");return;}
+    let user = gun.user();
+    let to = gun.user(publickey);//get alias
+    let who = await to.then() || {};//get alias data
+    if(!who.alias){console.log("No Alias!");return;}
+    user.get("contacts").get(publickey).put(null);
+    updateContacts();
+});
+function updateContacts(){
+    $('#usercontacts').empty();
+    $('#usercontacts').append($('<option selected disabled>-- Select User --</option>'));
+    let user = gun.user();
+    user.get("contacts").once().map().once(function(data,key){
+        //console.log("data",data);
+        //console.log("key",key);
+        if($("#" + key).length){
+        }else{
+            if(data !=null){
+                addusercontact(key, data);
+            }
+        }
+    });
+    console.log("update contacts");
+}
+function addusercontact(index, data) {
+    //console.log("index",index);console.log("value",data);
+    //console.log($("#" + index).length)
+    let bfound=false;
+    $("#usercontacts option").each(function(idx) {//loop option
+        if($(this).val() == index){//if key value exist
+            bfound=true;
+            return;
+        }
+        //$(this).siblings('[value="'+ val +'"]').remove();
+    });
+    if(!bfound){//if not found add option for user contacts
+        if($("#" + index).length){
+            console.log("NONE?")
+        }else{
+            $('#usercontacts').append($('<option/>', { 
+                //id: index,
+                value: index,
+                text : data.alias 
+            }));
+        }
+    }
+}
+$("#usercontacts").change(function(){
+    //console.log("selected");
+    let idx=$(this).val();
+    //console.log(idx);
+    $('#mpublickey').val(idx);
+    viewprivatemessages();
+});
+var messages=[];
+var UIdec;
+function CleanMessages(){
+    $('#messagelist').empty();
+}
+async function sendprivatemessage(){
+    let msg = ($('#inputmessagechat').val() || '').trim();
+    let publickey = ($('#mpublickey').val() || '').trim();
+    if(!msg){console.log("Message EMPTY!");return;}
+    if(!publickey){console.log("Public Key EMPTY!");return;}
+    let user = gun.user();
+    let to = gun.user(publickey);//get alias
+    let who = await to.then() || {};//get alias data
+    if(!who.alias){console.log("No Alias!");return;}
+    let sec = await Gun.SEA.secret(who.epub, user._.sea); // Diffie-Hellman
+    let enc = await Gun.SEA.encrypt(msg, sec); //encrypt message
+    user.get('messages').get(publickey).set(enc);
+    console.log("finish...");
+}
+async function viewprivatemessages(){
+    let user = gun.user();
+    if(!user.is){ return }//check if user exist
+    //messages = [];
+    CleanMessages();
+    let pub = ($('#mpublickey').val() || '').trim();
+    if(!pub) return;//check if not id empty
+    let to = gun.user(pub);//get alias
+    let who = await to.then() || {};//get alias data
+    if(!who.alias){
+        console.log("No Alias!");
+        $('#mwho').text("who?");
+        return;
+    }
+    $('#mwho').text(who.alias);
+    UIdec = await Gun.SEA.secret(who.epub, user._.sea); // Diffie-Hellman
+    user.get('messages').get(pub).map().once((data,id)=>{
+        UI(data,id,user.is.alias)
+    });
+    to.get('messages').get(user._.sea.pub).map().once((data,id)=>{
+        UI(data,id,who.alias)
+    });
+}
+async function UI(say, id, alias){
+    say = await Gun.SEA.decrypt(say, UIdec);
+    //messages.push({id:id,alias:alias,message:say});
+    if($("#" + id).length){
+        //console.log("found!?");
+    }else{
+        $('#messagelist').append($('<div/>', { 
+            id: id,
+            text : alias + ": " + say
+        }));
+    }
+    let element = document.getElementById("messagelist");
+    element.scrollTop = element.scrollHeight;
+}
+$("#mpublickey").keyup(async function(e) {
+    viewprivatemessages();
+})
+$("#inputmessagechat").keyup(async function(e) {
+    //console.log(e);
+    //console.log($('#inputmessagechat').val());
+    if(e.key == "Enter"){
+        //console.log("Enter");
+        sendprivatemessage();
+    }
+});
+function MessagesResize(){
+    let height = $(window).height(); - $('#messages').offset().top;
+    //$('#messages').height(height);
+    $('#messages').css('height', height - 50);
+    //console.log(height);
+    //console.log($('#messages').offset().top);
+    height = $('#messages').height();
+    console.log(height);
+    $('#messagelist').css('height', height - 44);
+}
+$(window).resize(function() {
+    MessagesResize();
+});
+MessagesResize();
 //===============================================
 // 
+
+
 //===============================================
 // DIALOG MESSAGE
 function modalmessage(_text){
@@ -372,3 +528,4 @@ $('#btnshowmodal').click(function(){
 hidediv();
 $("#navmenu").hide();
 $("#forgot").hide();
+
