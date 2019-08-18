@@ -3,7 +3,7 @@
     Created by: Lightnet
     License: MIT
     Version: 3.0
-    Last Update:2019.08.16
+    Last Update:2019.08.17
 
     Credit: amark ( https://github.com/amark/gun)
 
@@ -49,8 +49,6 @@
     Gun Notes:
      * sea.js and gun.js are buggy with auth checks.
      * There is a bug in gun.user('publickey') will return as gun not user object.
-     
-
 */
 
 (function() {
@@ -65,23 +63,18 @@
         this.to.next(context);
     });
 
-    function trustlist(to, cb, opt){
+    function trustlist(cb, opt){
         console.log("`.trustlist` PROTOTYPE API DO NOT USE, TESTING!");
         cb = cb || function(ctx) { return ctx };
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug || gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
         }else{
             sharetype = "gun";
         }
-        let each = {};
         (async function(){
             //make sure that user root
             if(sharetype == "user"){
@@ -123,39 +116,18 @@
                 //tmp = Gun.val.link.ify(tmp);
                 //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
                 //console.log(tmp);
-
                 let who = await to.get('alias').then();
                 if(who!=null){
                     console.log("FOUND!",who);
                     let pub = await to.get('pub').then();
                     let sec = await gun.then();
                     console.log(sec);
-                    
-                    //let tagalias = '~@'+who;
-                    //sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
+                    let tagalias = '~@'+who;
+                    sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
                     let tagpub = '~'+pub;
                     sec = Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
                     //Example: {_:#~asdf, hello:'world'~fdsa}}
-
-                    // ALIAS LIST?
-                    //let test=Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub));
-                    //let tagwho = "~@"+who;
-                    //let test=Gun.obj.put({}, tagwho, Gun.val.link.ify(tagwho));
-                    //let tmp = {};
-                    //sec = Gun.obj.put(sec, '~@', test);
-                    //console.log(sec);
-
                     gun.put(sec,cb);
-                    //let tagpub = '~'+pub;
-                    //let tagpub = '~@'+pub;
-                    //let tagpub = '~@'+who;
-                    //let tagpub = '~'+who;
-                    //let tagpub = '~'+pub;
-                    //console.log(tagpub);
-                    //gun.put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub)));
-                    //gun.put(Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub)));
-                    //gun.back().put(Gun.obj.put({}, tagpub, Gun.val.link.ify(tagpub))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                    //console.log(gun.back());
                 }
                 console.log("done!");
             }
@@ -380,42 +352,18 @@
                     user.get('trust').get(pair.pub).get(path).put(enc);
                 }
                 enc = await SEA.encrypt(data, sec);
-
                 let enc2 = await gun.then();
                 // value enc and public keys from current gun graph
-                //if("SEA" == enc.slice(0,3)){
-                    //console.log('FOUND!');
-                    //enc = enc.substring(3, enc.length);
-                    //enc = JSON.parse(enc)
-                    //console.log(enc);
-                //}
-                enc={sea:enc};
                 //need to be convert into array not string 'SEA{...}' > {...}
                 let tmpp=enc;//json object
-                //need to rework later
+                //tmpp=
                 for(o in enc2){
-                    //console.log(o);
-                    /*
-                    if(o == "ct"){
-                    }else if (o == "iv"){//ignore
-                    }else if(o == "s"){//ignore
-                    }else if(o == '_'){//ignore
-                    }else{
-                        if("~@" == o.slice(0,2)){
-                            console.log("FOUND PUB KEY");
-                            let tmppub = o;
-                            console.log(tmppub);
-                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                            console.log(tmpp);
-                        }
-                    }
-                    */
                     if("~" == o.slice(0,1)){
                         console.log("FOUND PUB KEY");
                         let tmppub = o;
-                        console.log(tmppub);
+                        //console.log(tmppub);
                         tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                        console.log(tmpp);
+                        //console.log(tmpp);
                     }
                 }
                 gun.put(tmpp, cb);
@@ -440,87 +388,25 @@
                     let epub = await to.get('epub').then();
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);//SECRET
-                    console.log(key);
+                    //console.log(key);
                     //GET VALUE AND SHARE KEYS
                     let enc2 = await gun.then();
-                    console.log(enc2);
+                    //console.log(enc2);
                     //ENCRYPT VALUE
                     let enc3 = await SEA.encrypt(data, key);
-                    let tmpp={}
-                    //let tmpp=enc2;
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+"~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "~" +pair.pub, enc3+"~" +pair.pub);
-                    //enc3 = {sea:enc3+"~" +pair.pub};//
-                    enc3 = enc3+"~"+pair.pub;//
-                    //enc3 = {alias:{sea:enc3}};//
-                    //enc3 = {alias:{sea:enc3+"~"+pair.pub}};//
-                    //enc3 = {sea:enc3};//
-                    //enc3 = {sea:enc3+"~" +pair.pub};//
-                    //enc3 = Gun.obj.put(tmpp, "~"+'alias', enc3+"~"+pair.pub);
-                    //NO! Mismatched owner on '~ZjOFw8Lfjqxf2BEDAOAfAIv4haYyIJ8DQZphL3Zgrgw.Z0cXaDKwGmd0ab0a-DvqOl5vyW8zKUrLlEbulncDdiM'. 
                     console.log(enc3);
-                    gun.put(enc3, cb);
-                    //gun.put({}, cb);//odd work but bug!
-
-                    //let name = await user.get('alias').then();
-                    //enc3 = Gun.obj.put(enc2, name, enc3+ "~" +pair.pub);
-                    //console.log(enc3)
-                    //gun.put(enc3, cb);
-
-                    //let tmpp={}
-                    //let name = await user.get('alias').then();
-                    //enc3 = Gun.obj.put(tmpp, "~" +pair.pub, enc3+ "~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "~@"+name, enc3+ "~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+ "~" +pair.pub);
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3);
-                    //enc3 = Gun.obj.put(tmpp, "alias", enc3+"~" +pair.pub);
-                    //for(o in enc2){
-                        //if("~" == o.slice(0,1)){
-                            //let tmppub = o;
-                            //tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                        //}
-                    //}
-                    //console.log(tmpp);
-                    //gun.put(tmpp, cb);
-
-
-
-
-
-                    //STRING TO JSON OBJECT
-                    /*
-                    if("SEA" == enc3.slice(0,3)){
-                        //console.log('FOUND!');
-                        enc3 = enc3.substring(3, enc3.length);
-                        enc3 = JSON.parse(enc3)
-                    }
-                    */
-                    //let tmpp=enc3;
-                    //let tmpp={}
-                    //let name = await user.get('alias').then();
-                    //tmpp = Gun.obj.put(tmpp, name, enc3+ "~" +pair.pub);
-                    //enc3={sea:enc3}
-                    //Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
-                    //enc2 = Gun.obj.put(enc2, name, enc3+ "~" +pair.pub);
-                    //enc2 = Gun.obj.put(enc2, sea, enc3+ "~" +pair.pub);
-                    //console.log(tmpp);
-                    /*
+                    let tmpp={};
                     for(o in enc2){
                         if("~" == o.slice(0,1)){
-                            //console.log("FOUND PUB KEY");
+                            console.log("FOUND PUB KEY");
                             let tmppub = o;
                             //console.log(tmppub);
-                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                            //tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub));
                             //console.log(tmpp);
                         }
                     }
-                    */
-
-                    //console.log(tmpp);
-                    //gun.put(enc2, cb);
-                    //gun.put(tmpp, cb);
+                    //enc3 = tmpp;
+                    gun.put(enc3, cb);
                     //gun.put(enc, cb);
                 }
             }
@@ -557,11 +443,11 @@
                     cb(undefined);
                     return gun;
                 }
-                if(key.sea === undefined){
-                    cb(null);
-                    return gun;
-                }
-                key = key.sea;//TESTING....
+                //if(key.sea === undefined){
+                    //cb(undefined);
+                    //return gun;
+                //}
+                //key = key.sea;//TESTING....
                 let value = await SEA.decrypt(key, sec);
                 cb(value);
             }
@@ -580,18 +466,28 @@
                     }
                 }
                 if('~' === root._.soul.slice(0,1)){//public key
-                    let soul;// = root._.soul.slice(0,1);
+                    //let soul;// = root._.soul.slice(0,1);
                     //console.log(SEA.opt.pub(root._.soul));
-                    soul=SEA.opt.pub(root._.soul);
+                    //soul=SEA.opt.pub(root._.soul);
                     //let to = gun.user(soul);
                     let to = root;//user root graph
                     let enc1 = await to.get('trust').get(pair.pub).get(path).then();
                     let epub = await to.get('epub').then();
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);
+                    //console.log(key);
                     let enc2 = await gun.then();
-                    console.log(enc2);
-                    enc2 = enc2.sea;//TESTING....
+                    if(enc2 === undefined){
+                        //console.log("FOUND NULL");
+                        cb(undefined);
+                        return gun;
+                    }
+                    //if(enc2.sea === undefined){
+                        //cb(undefined);
+                        //return gun;
+                    //}
+                    //console.log(enc2);
+                    //enc2 = enc2.sea;//TESTING....
                     console.log(enc2);
                     //enc2 = "SEA"+ JSON.stringify(enc2);
                     let value = await SEA.decrypt(enc2, key);
@@ -602,7 +498,6 @@
         }());
         return gun;
     }
-
     //SETUP FUNCTION for GUN
     Gun.chain.trustkey = trustkey;
     Gun.chain.distrustkey = distrustkey;
@@ -612,5 +507,4 @@
     Gun.chain.decryptonce = decryptonce;
     //TESTING...
     Gun.chain.trustlist = trustlist;
-    
 }());

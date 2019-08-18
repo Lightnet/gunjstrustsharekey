@@ -23,11 +23,35 @@ gun.get('mark').on(function(data, key){
   //console.log("update:", data);
   doc.innerText = data.name;
 });
-//console.log("test");
 //gun.get('~@test').map(function(data,key){//user
     //console.log("data",data);
 //});
-//console.log("test");
+//===============================================
+// TESTING LOGIN / DO NOT USED PRODUCTION!
+var users=[];
+users.push({index:0,value:"test",passphrase:"test"});
+users.push({index:1,value:"beta",passphrase:"test"});
+users.push({index:2,value:"sss",passphrase:"test"});
+users.push({index:3,value:"bbb",passphrase:"test"});
+$("#users").change(function(){
+    //console.log("selected");
+    let idx=$(this).val();
+    //console.log(idx);
+    if(users[idx]!=null){
+        $('#alias').val(users[idx].value);
+        $('#passphrase').val(users[idx].passphrase);
+    }
+});
+function addusers(index, data) {
+    //console.log("index",index);console.log("value",data);
+    $('#users').append($('<option/>', { 
+        value: index,
+        text : data.value 
+    }));
+}
+$.each(users,addusers);
+//===============================================
+// TEST GUN / USER
 $("#btngun").click(function(){
     console.log(gun);
 });
@@ -199,6 +223,7 @@ $("#trustlist").click(async function(){
 $("#putvalue").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
     let keyvalue = $('#dataalias').val();// input text
+    keyvalue="helloworld";
     console.log(keyvalue);
     if(key.length == 0){console.log("EMPTY!");return;}
     let to = gun.user(key);

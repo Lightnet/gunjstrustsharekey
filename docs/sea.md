@@ -3,6 +3,7 @@
 ```
 https://jsbin.com/zupadojipa/edit?js,console
  * work test.
+@Lightnet I made a function recently for @Dletta to make it easier to merge 2 nodes in to 1 new node: https://github.com/amark/gun/blob/master/lib/mix.js
 
 
 ```
