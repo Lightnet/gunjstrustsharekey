@@ -12,6 +12,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <!-- RAD/LEX -->
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/gun/lib/store.js"></script>
+	  <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>-->
     <script src="/gunjstrustsharekeyv3.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
@@ -98,7 +103,7 @@
             <label id="mwho">who?</label>
           </div>
           <div id="messagelist" style="background-color: darkgray;">
-            Test
+            
           </div>
           <div id="messageinputarea"style="height:22px;width:100%">
             <input id="inputmessagechat" value="ss">
@@ -106,11 +111,23 @@
         </div>
 
         <div id="publicchat">
-          publicchat
+          Public Chat
+          <div id="publicchatlist" style="background-color: darkgray;overflow-y: scroll;">
+            Not Init.
+          </div>
+          <div id="publicchatarea"style="height:22px;width:100%">
+            <input id="inputpublicchat" value="ss">
+          </div>
         </div>
 
         <div id="privatechat">
-          privatechat
+          Private Chat
+          <div id="privatechatlist" style="background-color: darkgray;">
+            Not Init.
+          </div>
+          <div id="privatechatarea"style="height:22px;width:100%">
+            <input id="inputprivatechat" value="ss">
+          </div>
         </div>
 
         <div id="Modal" class="modal">
