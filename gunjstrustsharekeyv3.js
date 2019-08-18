@@ -7,8 +7,7 @@
 
     Credit: amark ( https://github.com/amark/gun)
 
-    Status:
-     * Work in progress!
+    Status(Work in progress!):
      * Working on trust public key will conflict with share key functions!
      * Work in progress to test dis/trust public key.
      * encryptput not working to...get(...).encryptput() NO! Mismatched owner on 'ct'. 
@@ -16,13 +15,13 @@
     Information: This is addon chain to sea.js for user to test functions of acess write and read
     in encryption. It is base on sea.js user functions that is current not improve yet.
 
-    gun functions:
-     * trustkey(to, cb, opt) - writable: allow, public key (work in progress)
-     * distrustkey(to, cb, opt) - writable: denied, public key (work in progress)
+    Gun functions:
+     * trustkey(to, cb, opt) - writable: allow, public key (wip)
+     * distrustkey(to, cb, opt) - writable: denied, public key (wip)
      * grantkey(to, cb, opt) - readable: allow, share key (working for user root)
-     * revokekey(to, cb, opt) - readable: denied, share key (working for user root / work in progress trust key)
-     * encryptput(data, cb, opt) - encrypt: value (working for user root / work in progress trust key)
-     * decryptonce( cb, opt) - decrypt: value (working for user root / work in progress trust key)
+     * revokekey(to, cb, opt) - readable: denied, share key (working for user root / wip trust key)
+     * encryptput(data, cb, opt) - encrypt: value (working for user root / wip trust key)
+     * decryptonce( cb, opt) - decrypt: value (working for user root / wip trust key)
      
     dis/trustkey:
       The owner user key graph to dis/allow for other users write access of the value or data.
@@ -32,7 +31,7 @@
       Example:
       gun.get('namespace').get('foo').put({SEA{ct:"",iv:"",s:""},~@publickey1,~@publickey2}); //does not work
 
-      Example put:(work in progress might not work)
+      Example put:(wip might not work)
        * sea: "SEA{ct: "...",iv: "...",s: "..."}}"
        * ~@publickey1:{'#': ~@publickey1}
        * ~@publickey2:{'#': ~@publickey2}
@@ -50,7 +49,6 @@
      * sea.js and gun.js are buggy with auth checks.
      * There is a bug in gun.user('publickey') will return as gun not user object.
 */
-
 (function() {
 
     var Gun = (typeof window !== "undefined")? window.Gun : require('gun/gun');
@@ -92,10 +90,10 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug || gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
@@ -207,10 +205,10 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase ||  gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
@@ -244,10 +242,10 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase ||  gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
@@ -290,12 +288,11 @@
                             console.log(uname, "REVOKE USER!");
                         }else{
                             console.log(uname, "PASS");
-                            let op = await user.get('trust').get(mkey).then();
-                            for (var p in op) {
-                                console.log(p);
-                            }
+                            //let op = await user.get('trust').get(mkey).then();
+                            //for (var p in op) {
+                                //console.log(p);
+                            //}
                             let ckey = await user.get('trust').get(mkey).get(path).then();
-                            
                             if(ckey != "null"){//Check if there user are revoke key if they are null should be ignore.
                                 //console.log(uname, "CREATE NEW SALT SHARE KEY ");
                                 let mto = gun.back(-1).user(mkey);
@@ -310,7 +307,6 @@
                         }
                     }
                 });
-        
                 //ENCRYPT VALUE
                 let v = await SEA.encrypt(value, sec);
                 gun.put(v, cb);
@@ -328,10 +324,10 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase ||  gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
@@ -372,7 +368,7 @@
             }
             //if user is not root graph
             if(sharetype == "gun"){
-                let countmax = 10;
+                let countmax = 10;//limit back to root loop
                 let root;
                 for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
                     let tmp = gun.back(i);//loop to find user root
@@ -391,29 +387,54 @@
                     //console.log(key);
                     //GET VALUE AND SHARE KEYS
                     let enc2 = await gun.then();
-                    //console.log(enc2);
+                    console.log(enc2);
                     //ENCRYPT VALUE
                     let enc3 = await SEA.encrypt(data, key);
                     console.log(enc3);
-                    let tmpp={};
+                    let enc0 = enc3;
+                    //enc0={alias:enc0+"~alias"};
+                    //enc0={alias:enc0};
+                    //let keylist = {};
+                    //console.log(user);
+                    //list = Gun.obj.put(list, "~"+pair.pub, enc3+"~"+pair.pub);
+                    //list = Gun.obj.put(list, "~@beta", enc3+"~"+pair.pub);
+                    //list = Gun.obj.put(list, "~@beta", enc3+"~@beta");
+                    //list = Gun.obj.put(list, "alias", enc3+"~"+pair.pub);//nope
+                    //enc0 = list;
+                    if("SEA" == enc0.slice(0,3)){
+                        //console.log('FOUND!');
+                        enc0 = enc0.substring(3, enc0.length);
+                        enc0 = JSON.parse(enc0)
+                    }
+                    console.log("enc0");
+                    console.log(enc0);
+                    //let tmpp={};
+                    //let tmpp=enc0;
                     for(o in enc2){
+                        //if(o == "ct"){
+                            //tmpp[o] = enc0.ct;
+                        //}else if (o == "iv"){//ignore
+                            //tmpp[o] = enc0.iv;
+                        //}else if(o == "s"){//ignore
+                            //tmpp[o] = enc0.s;
+                        //}]
                         if("~" == o.slice(0,1)){
-                            console.log("FOUND PUB KEY");
+                            //console.log("FOUND PUB KEY");
                             let tmppub = o;
                             //console.log(tmppub);
-                            //tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub));
+                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub));
                             //console.log(tmpp);
                         }
                     }
-                    //enc3 = tmpp;
-                    gun.put(enc3, cb);
+                    console.log(enc0);
+                    //enc0 = tmpp;
+                    gun.put(enc0, cb);
                     //gun.put(enc, cb);
                 }
             }
         }());
         return gun;
     }
-
     function decryptonce( cb, opt){
         console.log("`.decryptonce` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -421,10 +442,10 @@
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         //console.log(user);
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug ||  gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid ||  gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid ||  gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase ||  gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";

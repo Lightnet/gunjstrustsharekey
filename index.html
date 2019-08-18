@@ -21,9 +21,7 @@
   <body>
     <main>
       <label>Nodejs http with Gun.js</label>
-      <div id="guntext">
-        ...
-      </div>
+      <div id="guntext">...</div>
       <button id="btngun">Gun</button>
       <button id="btnuser">User</button>
       <!--<button id="btnshowmodal">Modal</button>-->
@@ -37,7 +35,7 @@
       
         <div id="login">
           <select id="users">
-            <option selected="true" disabled>-- None Selected! --</option>
+            <option selected="true" disabled>-- Select User! --</option>
           </select>
           Alias:<input id="alias" value="test" />
           Passphrase:<input id="passphrase" value="test" />
@@ -70,7 +68,7 @@
             <button id="trustlist"> trust list (pub key) </button>
             <br>
             <br> Search Public Key:
-            <br> <input id="inputsearchpublickey" />
+            <br> <input id="inputsearchpublickey" /><label id="searchalias"> Alias: ?</label>
             <br> Alias: <input id="dataalias" /><button id="putvalue"> Put? </button>
 
         </div>

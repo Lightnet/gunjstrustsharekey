@@ -29,10 +29,10 @@ gun.get('mark').on(function(data, key){
 //===============================================
 // TESTING LOGIN / DO NOT USED PRODUCTION!
 var users=[];
-users.push({index:0,value:"test",passphrase:"test"});
-users.push({index:1,value:"beta",passphrase:"test"});
-users.push({index:2,value:"sss",passphrase:"test"});
-users.push({index:3,value:"bbb",passphrase:"test"});
+users.push({index:0,value:"beta",passphrase:"test"});
+users.push({index:1,value:"sss",passphrase:"test"});
+users.push({index:2,value:"bbb",passphrase:"test"});
+users.push({index:3,value:"test",passphrase:"test"});
 $("#users").change(function(){
     //console.log("selected");
     let idx=$(this).val();
@@ -251,6 +251,11 @@ $("#inputsearchpublickey").keyup(async function() {
     let publickey = $("#inputsearchpublickey").val();
     let to = gun.user(publickey);
     if(publickey.length==0){console.log("NONE");return;}
+    let who = await to.get('alias').then();
+    if(!who){
+        who = "null";
+    }
+    $('#searchalias').text(' Alias: '+who);
     to.get('profile').get('alias').decryptonce(ack=>{
         console.log(ack)
         $('#dataalias').val(ack);
