@@ -59,6 +59,21 @@ $("#btnuser").click(function(){
     let user = gun.user();
     console.log(user);
 });
+function setClipboard(value) {
+    var tempInput = document.createElement("input");
+    tempInput.style = "position: absolute; left: -1000px; top: -1000px";
+    tempInput.value = value;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+}
+$("#aliaskeycopy").click(function(){
+    let user = gun.user();
+    if(!user.is)return;
+    //console.log(user.is.pub);
+    setClipboard(user.is.pub);
+});
 //===============================================
 // LOGIN
 $("#btnlogin").click(function(){
@@ -76,6 +91,7 @@ $("#btnlogin").click(function(){
             //$("#publicchat").show();
             $("#privatechat").show();
             $('#username').text($('#alias').val());
+            $('#aliaskeycopy').text("Alias:"+$('#alias').val()+" (Key Copy)");
             user.get('profile').get('alias').decryptonce(ack=>{//get user profile alias key for value
                 //console.log(ack);
                 $('#inputalias').val(ack);
@@ -604,10 +620,14 @@ PublicChatResize();
 // PRIVATE CHAT
 var privatechatkey="";
 var gunprivatechat;
+var privatesharekey="";
 function CleanPrivateChatMessages(){
     $('#privatechatlist').empty();
 }
-
+function scrollPrivateMessage(){
+    let element = document.getElementById("privatechatlist");
+    element.scrollTop = element.scrollHeight;
+}
 function PrivateChatResize(){
     let height = $(window).height(); - $('#privatechat').offset().top;
     $('#privatechat').css('height', height - 50);
@@ -627,39 +647,65 @@ $("#inputprivatechat").keyup(async function(e) {
         if(!msg) return;//check if not id empty
         let who = await user.get('alias').then();
         if(gunprivatechat !=null){
-            let enc = msg;
+            let enc = await SEA.encrypt(msg, privatesharekey);
+            enc = window.btoa(enc);//gun graph need to be string not SEA{} that will reject that is not soul of user
             gunprivatechat.get('message').get(timestamp()).put({
                 alias:who,
                 message:enc
             });
         }
-        //let encmsg = await SEA.work("public","chat");//encrypttion key default?
-        //console.log(encmsg);
-        //let enc = await SEA.encrypt(msg,encmsg);
-        //console.log(enc);
-        //let who = await user.get('alias').then();
-        //console.log(who);
-        //console.log(typeof enc)
-        //enc = window.btoa(enc);
-        //gun.get('chat').get(timestamp()).put({
-            //alias:who,
-            //message:enc
-        //});
         console.log("send private chat...");
     }
 });
-function initPrivateChat(){
+async function initPrivateChat(){
     //updateprivatechatlist();
     CleanPrivateChatMessages();
-    let publickey = ($('#privatechatkey').val() || "").trim();
-    if(!publickey)return;
-    console.log(publickey);
-    privatechatkey = publickey;
+    let privatekey = ($('#privatechatkey').val() || "").trim();
+    if(!privatekey)return;
     console.log("init chat...");
+    //Need to fail checks!
+    console.log(privatekey);
+    privatechatkey = privatekey;
+    let user = gun.user();
+    let pair = user._.sea;
+    //GET ENC SHARE KEY
+    let pub = await gun.get(privatechatkey).get('info').get('pub').then();
+    let title = await gun.get(privatechatkey).get('info').get('name').then();
+    if(pub == user.is.pub){
+        $('#ppublickey').show();
+        $('#btnprivatechatgrant').show();
+        $('#btnprivatechatrevoke').show();
+    }else{
+        $('#ppublickey').hide();
+        $('#btnprivatechatgrant').hide();
+        $('#btnprivatechatrevoke').hide();
+    }
+    $('#btnprivatechatcreate').hide();
+    $('#privatechatroom').hide();
+    $('#privatechatkey').hide();
+
+    $('#btnprivatechatjoin').hide();
+    $('#btnprivatechatadd').hide();
+    $('#btnprivatechatremove').hide();
+
+    $('#btnprivatechatname').text(title);
+    let to = gun.user(pub);
+    let epub =await to.get('epub').then();
+    let encsharekey = await to.get('privatechatroom').get(privatechatkey).get('pub').get(pair.pub).then();
+    console.log(encsharekey);
+    //let dh = await SEA.secret(pair.epub, pair);
+    let dh = await SEA.secret(epub, pair);
+    let dec = await SEA.decrypt(encsharekey, dh);
+    console.log(dec);
+    if(dec==null){
+        console.log("NULL SHARE KEY!");
+        return;
+    }
+    privatesharekey = dec;
     if(gunprivatechat !=null){
         gunprivatechat.off();
     }
-    gunprivatechat = gun.get(publickey);
+    gunprivatechat = gun.get(privatekey);
     let currentDate = new Date();
     let year = currentDate.getFullYear();
     let month = ("0" + (currentDate.getMonth() + 1 ) ).slice(-2);
@@ -669,25 +715,24 @@ function initPrivateChat(){
     async function qcallback(data,key){
         console.log('incoming messages...')
         //console.log("key",key);
-        console.log("data",data);
+        //console.log("data",data);
         if(data == null)return;
         if(data.message != null){
-            //let message = window.atob(data.message);
-            let message = data.message;
+            let message = window.atob(data.message);
+            //let message = data.message;
             //console.log(message);
-            //let dec = await SEA.decrypt(message,encmsg);
-            let dec = message;
+            let decmsg = await SEA.decrypt(message,privatesharekey);
+            //let dec = message;
             //console.log(dec)
-            if(dec!=null){
+            if(decmsg!=null){
                 $('#privatechatlist').append($('<div/>', { 
                     id: key,
-                    text : data.alias + ": " + dec
+                    text : data.alias + ": " + decmsg
                 }));
-                scrollPublicMessage();
+                scrollPrivateMessage();
             }
         }
     }
-
     gunprivatechat.get('message').get({'.': {'*': timestring},'%': 50000}).map().once(qcallback);
 }
 async function addPrivateChat(index, data){
@@ -695,18 +740,21 @@ async function addPrivateChat(index, data){
     console.log("add chat room list");
     console.log(index);
     console.log(data);
-    let title = await user.get('privatechatroom').get(index).get('info').get('title').then();
-
+    let name = await user.get('privatechatroom').get(index).get('info').get('name').then();
     $('#privatechatroom').append($('<option/>', { 
         //id: index,
         value: index,
-        text : title
+        text : name
     }));
 }
 function updateprivatechatlist(){
+    $('#privatechatroom').empty();
+    $('#privatechatroom').append($('<option selected disabled> -- Select Private Chat -- </option>'));
     let user = gun.user();
     user.get('privatechatroom').once().map().once(function(data,key){
-        addPrivateChat(key,data);
+        if(data !=null){
+            addPrivateChat(key,data);
+        }
     });
 }
 $('#btnprivatechatcreate').click(async function(){
@@ -714,9 +762,9 @@ $('#btnprivatechatcreate').click(async function(){
     let user = gun.user();
     let pair = user._.sea;
     let genprivatechatid = Gun.text.random();
-
     let gensharekey = Gun.text.random();
-
+    let pname = "private chat "+genprivatechatid;
+    let pdescription= "private chat";
     let enc = await SEA.encrypt(gensharekey, pair);
 
     user.get('privatechatroom')
@@ -724,6 +772,7 @@ $('#btnprivatechatcreate').click(async function(){
 
     let dh = await SEA.secret(pair.epub, pair);
     enc = await SEA.encrypt(gensharekey, dh);
+
     user.get('privatechatroom')
     .get(genprivatechatid).get('pub').get(pair.pub).put(enc);
 
@@ -732,16 +781,16 @@ $('#btnprivatechatcreate').click(async function(){
     .get('info')
     .put({
         pub:pair.pub,
-        title:"privatechatid"+genprivatechatid,
-        //content:content,
+        name:pname,
+        description:pdescription,
         date:timestamp()
     });
     gun.get(genprivatechatid)
         .get('info')
         .put({
             pub:pair.pub,
-            title:"privatechatid"+genprivatechatid,
-            //content:content,
+            name:pname,
+            description:pdescription,
             date:timestamp()
         });
 });
@@ -749,17 +798,107 @@ $('#btnprivatechatjoin').click(function(){
     console.log("btnprivatechatjoin");
     initPrivateChat();
 });
-$('#btnprivatechatadd').click(function(){
+$('#btnprivatechatadd').click(async function(){
     console.log("btnprivatechatadd");
+    let user = gun.user();
+    if(!user.is)return;
+    let privatekey = ($('#privatechatkey').val() || "").trim() ;
+    if(!privatekey)return;
+    let gkey = await gun.get(privatekey).then();
+    //console.log(gkey);
+    if(gkey == undefined){
+        console.log("NOT FOUND!");
+        return;
+    }
+    let guninfo = gun.get(privatekey).get('info');
+    let pub = await guninfo.get('pub').then();
+    let title = await guninfo.get('name').then();
+    let description = await guninfo.get('description').then();
+    let date = await guninfo.get('date').then();
+    //console.log(pub);console.log(title);console.log(date);
+    user.get('privatechatroom').get(privatekey).get('info').put({
+        pub:pub,
+        name: title,
+        description:description,
+        date:date
+    });
 });
-$('#btnprivatechatremove').click(function(){
+$('#btnprivatechatremove').click(async function(){
     console.log("btnprivatechatremove");
+    let user = gun.user();
+    if(!user.is)return;
+    let privatekey = ($('#privatechatkey').val() || "").trim();
+    if(!privatekey)return;
+    let gkey = await gun.get(privatekey).then();
+    if(gkey == undefined){
+        console.log("NOT FOUND!");
+        return;
+    }
+    user.get('privatechatroom').get(privatekey).put(null);
 });
-$('#btnprivatechatgrant').click(function(){
+$('#btnprivatechatgrant').click(async function(){
     console.log("btnprivatechatgrant");
+    let ppublickey = ($('#ppublickey').val() || "").trim();
+    if(!ppublickey)return;
+    let pkey = (privatesharekey || "").trim();
+    //check user pub key owner
+    let pownid = await gun.get(privatechatkey).get('info').get('pub').then();
+    //console.log(pownid);
+    //console.log(ppublickey);
+    if(pownid == ppublickey){
+        console.log("owner");
+        return;
+    }
+    let user = gun.user();
+    let pair = user._.sea;
+    let to = gun.user(ppublickey);
+
+    let who = await to.get('alias').then();
+    if(!who)return;
+    
+    if(!pkey)return;
+    let pub = await to.get('pub').then();
+    let epub = await to.get('epub').then();
+    let dh = await SEA.secret(epub, pair);
+    let enc = await SEA.encrypt(pkey, dh);
+
+    user.get('privatechatroom')
+        .get(privatechatkey)
+        .get('pub')
+        .get(pub).put(enc);
+
+    console.log(pkey);
+    console.log("finish grant!");
 });
-$('#btnprivatechatrevoke').click(function(){
+$('#btnprivatechatrevoke').click(async function(){
     console.log("btnprivatechatrevoke");
+    let ppublickey = ($('#ppublickey').val() || "").trim();
+    if(!ppublickey)return;
+    let pkey = (privatesharekey || "").trim();
+    //check user pub key owner
+    let pownid = await gun.get(privatechatkey).get('info').get('pub').then();
+    if(pownid == ppublickey){
+        console.log("owner");
+        return;
+    }
+    let user = gun.user();
+    let pair = user._.sea;
+    let to = gun.user(ppublickey);
+    let who = await to.get('alias').then();
+    if(!who)return;
+    if(!pkey)return;
+    //need to generate new share key
+    //user.get('privatechatroom')
+        //.get(privatechatkey)
+        //.get('pub').map().once(function(data,key){});
+
+    let pub = await to.get('pub').then();
+    user.get('privatechatroom')
+        .get(privatechatkey)
+        .get('pub')
+        .get(pub).put(null);
+    console.log(pkey);
+    console.log("finish revoke!");
 });
 $('#privatechatroom').change(function(){
     console.log("privatechatroom");
@@ -787,4 +926,3 @@ $('#btnshowmodal').click(function(){
 hidediv();
 $("#navmenu").hide();
 $("#forgot").hide();
-

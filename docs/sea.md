@@ -5,7 +5,7 @@ https://jsbin.com/zupadojipa/edit?js,console
  * work test.
 @Lightnet I made a function recently for @Dletta to make it easier to merge 2 nodes in to 1 new node: https://github.com/amark/gun/blob/master/lib/mix.js
 
-
+https://gun.eco/docs/User#getting-a-user-via-alias
 ```
 
 ```javascript
@@ -17,6 +17,7 @@ root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next u
 ```javascript
 @Lightnet all data yeah is signed with some special stuff, the (1) (2) (3) organization has to do with handling special namespaces in GUN's universal graph.
 
+@Lightnet apologies if I'm light on details this time (gotta run, kids!) but something like user.get('myTrustedFriendsForDocA').get(BobPubKey).put(true) (obviously you'd want better naming structure)
 ```
 
 ```javascript

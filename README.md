@@ -48,7 +48,7 @@ User / Gun functions:
  * Public Chat encrypt example.
  * Change passphrase example.
  * Passphrase hint example.
- * Private Chat example. (Not build)
+ * Private Chat example. (WIP)
 
 ## Design & Guide:
  gun.js is database graph. By using namespace graph to check type object. That is need to create unique key or id on namespace root graph to identify as json object.
@@ -70,16 +70,16 @@ User / Gun functions:
  To create share key to need to add sea.js to client browser.
 
  ```html
-  ...
+  <!--...-->
   <head>
-    <!-- Required -->
+  <!-- Required -->
   <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
-    <!-- optional -->
+  <!-- optional -->
   <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
-    <!-- Required -->
+  <!-- Required -->
   <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
   </head>
-  ...
+  <!--...-->
  ```
   sea.js is add to gun.js for Security, Encryption, & Authorization - SEA. The reason is simple that encrypt and decrypt will not work when trying to read data without sea.js script to run correctly.
 
