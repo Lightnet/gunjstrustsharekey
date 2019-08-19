@@ -1,6 +1,7 @@
 //===============================================
 // CLEAR GUN DATABASE
 localStorage.clear();
+//(function() {
 //===============================================
 // INIT GUN DATABASE
 let gunurl = window.location.origin+'/gun';
@@ -86,10 +87,11 @@ $("#btnlogin").click(function(){
             //console.log(ack);
             //modalmessage(ack);
             $("#login").hide();
-            //$("#profile").show();
+            $("#profile").show();
+            selectactive("btnprofile");
             //$("#messages").show();
             //$("#publicchat").show();
-            $("#privatechat").show();
+            //$("#privatechat").show();
             $('#username').text($('#alias').val());
             $('#aliaskeycopy').text("Alias:"+$('#alias').val()+" (Key Copy)");
             user.get('profile').get('alias').decryptonce(ack=>{//get user profile alias key for value
@@ -294,30 +296,54 @@ function hidediv(){
 $('#btnprofile').click(function(){
     hidediv();
     $("#profile").show();
+    selectactive("btnprofile");
 });
 $('#btnchangepassphrase').click(function(){
     hidediv();
     $("#changepassphrase").show();
+    selectactive("btnchangepassphrase");
 });
 $('#btnpassphrase').click(function(){
     hidediv();
     $("#passphrasehint").show();
+    selectactive("btnpassphrase");
 });
 $('#btnmessage').click(function(){
     hidediv();
     $("#messages").show();
+    selectactive("btnmessage");
 });
 $('#btnpublicchat').click(function(){
     hidediv();
     InitChat();
     $("#publicchat").show();
+    selectactive("btnpublicchat");
 });
 $('#btnprivatechat').click(function(){
     hidediv();
     $("#privatechat").show();
     //initPrivateChat();
     updateprivatechatlist();
+    selectactive("btnprivatechat");
 });
+var tabs=[]
+tabs.push({id:"btnprofile"});
+tabs.push({id:"btnchangepassphrase"});
+tabs.push({id:"btnpassphrase"});
+tabs.push({id:"btnmessage"});
+tabs.push({id:"btnpublicchat"});
+tabs.push({id:"btnprivatechat"});
+function selectactive(tab){
+    for(let idx in tabs){
+        console.log(tab);
+        //$('#'+tabs[idx].id).removeClass("active");
+        if($('#'+tabs[idx].id).hasClass('active')){
+            $('#'+tabs[idx].id).removeClass("active");
+            break;
+        }
+    }
+    $('#'+tab).addClass("active");
+}
 //===============================================
 // CHANGE PASSPHRASE
 $('#btnchangepassphraseapply').click(function(){
@@ -719,11 +745,7 @@ async function initPrivateChat(){
         if(data == null)return;
         if(data.message != null){
             let message = window.atob(data.message);
-            //let message = data.message;
-            //console.log(message);
             let decmsg = await SEA.decrypt(message,privatesharekey);
-            //let dec = message;
-            //console.log(dec)
             if(decmsg!=null){
                 $('#privatechatlist').append($('<div/>', { 
                     id: key,
@@ -926,3 +948,7 @@ $('#btnshowmodal').click(function(){
 hidediv();
 $("#navmenu").hide();
 $("#forgot").hide();
+$('#ppublickey').hide();
+$('#btnprivatechatgrant').hide();
+$('#btnprivatechatrevoke').hide();
+//}());

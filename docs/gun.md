@@ -16,7 +16,19 @@ This will only work for less than X number of users. For larger than X number of
 ```
 
 ```
+You can pass {'<': 'zach', '-': 1} to have the byte limit go in reverse lexical direction.
 
+Lexical gets are matched based in order of cascading specificness:
+
+= exact match. If {'=': 'key'} is specified, (1 >) will not match.
+* prefix match or (2 <) match. If {'*': 'key'} is specified, (2 >) will not match.
+> and < match or (3 <) match. If {'>': 'start', '<': 'end'} is specified, (3 >) not matched.
+> or < match or (4 <) match. As {'>': 'start'} or {'<': 'end'}.
+A > match will already include everything a * matches, this is true and obvious if you think about it in detail. What may not be obvious though is:
+
+Note: > will also match for an = exact match even if = is not listed (if it is, it will overrule >). So {'>': 'alice'} will match 'alice' also, same for <. So think of it as a hierarchy > || (> && <) || * || = or < || (< && >) || * || =.
+
+There is no guarantee a peer will comply with lexical constraints. Just like in real life, if you ask somebody a question, they might answer with additional information. Every peer should enforce the constraint.
 ```
 
 

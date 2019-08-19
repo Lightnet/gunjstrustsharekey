@@ -27,3 +27,7 @@ html,body {
   border: 1px solid #888;
   width: 80%;
 }
+
+.active{
+  background-color: #c2c2d6;
+}
