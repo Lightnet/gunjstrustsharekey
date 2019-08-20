@@ -21,8 +21,7 @@
 ## Information:
  This is just Gun chain share key, trust writable key, and encryption setup functions. To grant and revoke owner user key graph for users access to able to read data value for share key access. To used share key to write encrypt data for other can only read. The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value. As well encryptput and decryptonce key value to encode and decode owner as well other user but permission access read and write.
  
- To learn how SEA.js 
- (Security Encryption Authorization ) that works with gun.js.
+ To learn how SEA.js (Security Encryption Authorization ) that works with gun.js.
 
  * https://gun.eco/docs/SEA
 
@@ -197,5 +196,56 @@ gun.get('o').map().once(function(value, key){
 ```
 
 It be used as trust keys and public keys that store who own user root.
+
+```javascript
+async function createsharekeyy(){
+  let user = gun.user();
+  let pair = user._.sea;
+  let enc,sec;
+  //check if user create share key
+  sec = user.get('privatechatroom').get('randomid').get('pubs').get(pair.pub).then();
+  //if doesn't exist create share key
+  if(!sec){//if key is null
+    sec = Gun.text.random();
+    //need to encode
+    enc = await SEA.encrypt(sec, pair);
+    //ownin user store encrypt data
+    user.get('privatechatroom').get('randomid').get(pair.pub).put(enc);
+  }
+  sec = await SEA.decrypt(sec, pair);
+  console.log(sec);
+}
+```
+This setup share key for self but same setup.
+
+```javascript
+async function sharekey(to,cb){
+  let user = gun.user();
+  let pair = user._.sea;
+  let enc,sec;
+  //check if user create share key
+  sec = user.get('privatechatroom').get('randomid').get('pubs').get(pair.pub).then();
+  //if doesn't exist create share key
+  if(!sec){//if key is null
+    sec = Gun.text.random();
+    //need to encode
+    enc = await SEA.encrypt(sec, pair);
+    //ownin user store encrypt data
+    user.get('privatechatroom').get('randomid').get(pair.pub).put(enc);
+  }
+  sec = await SEA.decrypt(sec, pair);
+  //setup variable
+  let pub = await to.get('pub').then();
+  let epub = await to.get('epub').then();
+  //create secret code to and user to hash code
+  let dh = await SEA.secret(epub, pair);
+  // encode hash
+  enc = await SEA.encrypt(sec, dh);
+  //store to user to owner user graph
+  user.get('privatechatroom').get('randomid').get('pubs').get(pub).put(enc, cb);
+  console.log(sec);
+}
+```
+This same setup but with grant other user for share key setup added.
 
 work in progress...
