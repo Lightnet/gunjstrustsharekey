@@ -64,8 +64,8 @@
 
             <br>Profile:<label id="username"></label>
             <br>
-            <br>Access Public Key: <input id="accesskey" /> <label id="lookalias">None</label>
-            <br>Alias: <input id="inputalias" /> 
+            <br>Access Public Key: <input id="accesskey" placeholder="public key"/> <label id="lookalias">None</label>
+            <br>Alias: <input id="inputalias" placeholder="value"/> 
             <button id="getalias"> Get Value </button>
             <button id="grantkey"> Grant (share key) </button> 
             <button id="revokekey"> Revoke (share key) </button>
@@ -74,14 +74,14 @@
             <button id="trustlist"> trust list (pub key) </button>
             <br>
             <br> Search Public Key:
-            <br> <input id="inputsearchpublickey" /><label id="searchalias"> Alias: ?</label>
-            <br> Alias: <input id="dataalias" /><button id="putvalue"> Put? </button>
+            <br> <input id="inputsearchpublickey" placeholder="public key"/><label id="searchalias"> Alias: ?</label>
+            <br> Alias: <input id="dataalias" placeholder="value"/><button id="putvalue"> Put? </button>
 
         </div>
 
         <div id="changepassphrase">
-          Old Passphrase:<input id="oldpassphrase" value="test" />
-          <br>New Passphrase:<input id="newpassphrase" value="test" />
+          Old passphrase:<input id="oldpassphrase" value="" placeholder="old passphrase"/>
+          <br>New passphrase:<input id="newpassphrase" value="" placeholder="new passphrase"/>
           <br><button id="btnchangepassphraseapply"> Apply </button>
         </div>
 
@@ -98,7 +98,7 @@
             <select id="usercontacts">
               <option selected disabled>-- Select User --</option>
             </select>
-            <label>Public Key:</label><input id="mpublickey" value="" />
+            <label>Public Key:</label><input id="mpublickey" value="" placeholder="public key"/>
             <button id="btnadduser">+</button>
             <button id="btnremoveuser">-</button>
             <label id="mwho">who?</label>
@@ -127,13 +127,14 @@
           <select id="privatechatroom">
             <option selected disabled>-- Select Private Chat --</option>
           </select>
-          <input id="privatechatkey" />
+          <input id="privatechatkey" placeholder="private chat room key"/>
           <button id="btnprivatechatjoin">Enter</button>
+          <button id="btnprivatechatleave">Leave</button>
           <button id="btnprivatechatadd">+</button>
           <button id="btnprivatechatremove">-</button>
 
           <label id="btnprivatechatname">key?</label>
-          <input id="ppublickey" />
+          <input id="ppublickey" placeholder="public key"/>
           <button id="btnprivatechatgrant">grant</button>
           <button id="btnprivatechatrevoke">revoke</button>
 
