@@ -216,7 +216,7 @@ async function createsharekeyy(){
   console.log(sec);
 }
 ```
-This setup share key for self but same setup.
+This setup share key for self.
 
 ```javascript
 async function sharekey(to,cb){
