@@ -51,7 +51,7 @@ User / Gun functions:
  * Private Chat example. (WIP)
 
 ## Design & Guide:
- gun.js is database graph. By using namespace graph to check type object. That is need to create unique key or id on namespace root graph to identify as json object.
+ gun.js is database graph. By using namespace graph to check type object reason is typescript code langugae need to check types. Gun key graph root is need to create unique key or id on namespace root graph to identify as json object.
 
  ```javascript
   //json object
@@ -66,6 +66,8 @@ User / Gun functions:
 
  ```
  By default keys are generate by uuid to kept the database record revision key and value. If there another json or array it will create keys.
+
+ sea.js addon layer of gun.js to build encrytion, security, and authorization. You can use gun or gun.user() for graph. But note if using gun graph for encrytion will not work since it filter on user is verify if user is login to write check root graph.
  
  To create share key to need to add sea.js to client browser.
 
@@ -95,22 +97,63 @@ User / Gun functions:
   SEA.work
  ``` 
 
+ Sea User functions:
+
+ https://gun.eco/docs/User
+
+```javascript
+let user = gun.user();
+//login
+user.auth($('#alias').val(), $('#passphrase').val(),(ack)=>{
+    if(ack.err){//check if error object exist will show
+      console.log(ack.err);
+    }else{//else it login
+      console.log(ack);
+      let pair = ack.sea;
+    }
+});
+
+//create user
+user.create($('#alias').val(), $('#passphrase').val(),(ack)=>{//create user and 
+  if(ack.err){
+    console.log(ack.err);//if user exist or error
+  }else{
+    console.log(ack);//pass if created
+  }
+});
+user.leave(opt, cb); //does not work, not yet implementation
+user.delete(alias, pass, cb) //does not work, not yet implementation
+user.recall({sessionStorage:true}, cb) // work
+
+user.trust(user) // not yet implementation
+user.grant(user) // work
+user.secret(value) // work
+user.alive() // work ?
+gun.user(publicKey).once(console.log)//get user data graph.
+```
+
  Using the simple example gunjstrustsharekeyv1.js. To create those will need gun/lib/then for it work. One reason is to return value or data.
 
- It base on user root access. It is prevent write data but only user who login and access to read and write. For other user who can only read data if encrypt or not encrypt data. By using sea.js from gun.js package npm or url package cdn.
+ It base on user root graph of sea.js. It is prevent write data but only user who login and access to read and write. For other user who can only read data if encrypt or not encrypt data. By using sea.js add layer of gun.js package npm or url package cdn.
 
  Example:
 
  ```javascript
+  var gun = Gun();
+ ```
+
+ ```javascript
+  //note user has to be created and login to work correct
   let user = gun.user();//current user that is login
   user.get('profile').put({foo:"bar"}); //edit and write
  ```
 
  ```javascript
+  //need to create another user to work correctly.
   let to = gun.user('user-public-key');//user read only
   to.get('profile').put({foo:"bar"});//denied write not owner
  ```
- The graph sea.js create and auth has key checks to prevent imposter editing it. But there is public access to read, write, edit, and delete. That is beside user.js is gun.js.
+ The graph sea.js create and auth has node security checks to prevent imposter editing it. But there is public access to read, write, edit, and delete(you can null them only for record history version). You can allow user to edit the owning user with permission with trust function (not yet implementation).
 
 ```javascript
  gun.get('namespace').get('child').put({foo:"bar"})
@@ -124,6 +167,7 @@ User / Gun functions:
 ## Map/List
  gun has simalar to javascript object when getting key and value.
 
+### object json
 ```javascript
 var o={foo:"bar"}; //json object
 for(let i in o){
@@ -133,12 +177,22 @@ for(let i in o){
   console.log("value ",o[i]);
 }
 ```
-
+### gun json
 ```javascript
 gun.get('o').put({foo:"bar"}); //json object
 gun.get('o').map().once(function(value, key){
   console.log("value",value);
   console.log("key",key);
+});
+```
+### gun set() function
+```javascript
+gun.get('o').set({foo:"bar"});
+//by default key generate string text uuid
+//by using map() to list key and data
+gun.get('o').map().once(function(value, key){
+  console.log("value",value);//{foo:"bar"}
+  console.log("key",key);//key generate string text uuid
 });
 ```
 
