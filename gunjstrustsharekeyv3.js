@@ -100,10 +100,18 @@
         }else{
             sharetype = "gun";
         }
-
         let each = {};
         (async function(){
+            //if (Gun.is(user)) {
+                //user.get('pub').get((ctx, ev) => {
+                  //console.log(ctx, ev);
+                //});
+                //let pub = await user.get('pubs').then();
+                //console.log(pub);
+            //}
             //make sure that user root
+            
+            
             if(sharetype == "user"){
                 //console.log(gun);
                 //sea.js
@@ -120,15 +128,23 @@
                     let pub = await to.get('pub').then();
                     let sec = await gun.then();
                     console.log(sec);
-                    let tagalias = '~@'+who;
-                    sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
+                    //let tagalias = '~@'+who;
+                    //sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
                     let tagpub = '~'+pub;
                     sec = Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
                     //Example: {_:#~asdf, hello:'world'~fdsa}}
                     gun.put(sec,cb);
+                    let tmp = tagpub;
+                    gun.back().put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp)));
+                    gun.put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp)));
                 }
+
+                //let r = gun.back(-1);
+                //console.log(r);
                 console.log("done!");
             }
+            
+            
             //if(sharetype == "gun"){}
         }());
         return gun;
@@ -336,6 +352,7 @@
         }
         (async function(){
             let enc, sec;
+            console.log(gun);
             if(sharetype == "user"){
                 sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
@@ -401,15 +418,24 @@
                     //list = Gun.obj.put(list, "~@beta", enc3+"~@beta");
                     //list = Gun.obj.put(list, "alias", enc3+"~"+pair.pub);//nope
                     //enc0 = list;
-                    if("SEA" == enc0.slice(0,3)){
+                    //if("SEA" == enc0.slice(0,3)){
                         //console.log('FOUND!');
-                        enc0 = enc0.substring(3, enc0.length);
-                        enc0 = JSON.parse(enc0)
-                    }
-                    console.log("enc0");
-                    console.log(enc0);
+                        //enc0 = enc0.substring(3, enc0.length);
+                        //enc0 = JSON.parse(enc0)
+                    //}
+                    //enc0 ={pub:enc0+"~"+pair.pub}
+                    //enc0 ={alias:enc0+"~"+pair.pub}
+                    //enc0 ={alias:enc0+"~"+pair.pub}
+
+                    //enc0 = Gun.obj.put({}, "~"+pair.pub, enc0+"~"+pair.pub)
+                    //console.log("enc0");
+                    //console.log(enc0);
+                    //console.log(gun.back().get(gun._.get))
+                    //gun.back(1).get(gun._.get).get(enc0).get(pair.pub).put(true);
                     //let tmpp={};
                     //let tmpp=enc0;
+                    //console.log(gun._.get);
+                    //gun.back().get(gun._.get).get(enc0).get(pair.pub).put(true);
                     for(o in enc2){
                         //if(o == "ct"){
                             //tmpp[o] = enc0.ct;
@@ -420,14 +446,13 @@
                         //}]
                         if("~" == o.slice(0,1)){
                             //console.log("FOUND PUB KEY");
-                            let tmppub = o;
-                            //console.log(tmppub);
-                            tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub));
-                            //console.log(tmpp);
+                            enc0 = Gun.obj.put(enc0, o, Gun.val.link.ify(o));
                         }
                     }
                     console.log(enc0);
                     //enc0 = tmpp;
+                    //gun.back().get('any'+user._.sea.pub+'alias').put(enc0);
+                    //gun.back().get('alias').put(enc0);
                     gun.put(enc0, cb);
                     //gun.put(enc, cb);
                 }

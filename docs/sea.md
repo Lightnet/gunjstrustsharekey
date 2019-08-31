@@ -28,3 +28,49 @@ TBH, though it might sound tacky, this algorithm was inspired by photon's partic
 super old talk of mine on this: https://youtu.be/5BuoDqVxvOM
 BBL
 ```
+
+
+https://github.com/amark/gun/blob/9ac94db8b3c3ad28dcf59356f44ce56dc4d14a1f/sea.js#L1239
+
+@Lightnet I had it figured out but forgot, let me look at code again
+
+Lightnet @Lightnet 15:11
+ok
+
+Jachen Duschletta @Dletta 15:24
+the root key is '~pubkey'
+
+Lightnet @Lightnet 15:24
+how?
+I know that @amark said not sure how setup
+
+
+gun.get('any'+user._.sea.pub+'keyName').get(something).put(something)
+[3:37 PM] Dletta: Then if you are logged in but are not the owner of that path, it will not let you write to it
+
+```javascript
+SEA.opt.pub();
+Gun.obj.empty(node, '_')
+Gun.obj.map(node, each.way, {soul: soul, node: node});
+
+line 792
+root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
+root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp)));
+```
+
+```javascript
+You would have bob.get('sharedData').get('aliceKey').path.put(data) and same on alice side. Then when your UI looks at the data it needs to realize it's shared data with alice and retrieve the same path for both you (bob) and alice and use gun.mix(aliceNode, bobNode) is what the ui shows
+
+No, just a common path, bob in this example is gun.user().get('sharedData')
+```
+
+```
+let data ="test"
+let alice =alice.get('sharedData').get('aliceKey').get('profile').get('alias').put(data)
+data ="test2"
+let bob = bob.get('sharedData').get('aliceKey').get('profile').get('alias').put(data)
+
+ gun.mix(aliceNode, bobNode)
+```
+
+Symmetric, so bob has shareddata/groupkey or shareddata/alice and alice has shareddata/groupkey, shareddata/bob

@@ -12,6 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gun/lib/mix.js"></script>
     <!-- RAD/LEX -->
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/radix.js"></script>
 	  <script src="https://cdn.jsdelivr.net/npm/gun/lib/radisk.js"></script>
@@ -19,8 +20,11 @@
 	  <script src="https://cdn.jsdelivr.net/npm/gun/lib/rindexed.js"></script>
     <!--<script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>-->
     <script src="/gunjstrustsharekeyv3.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
-    <!--<script src="/gunadapter.js"></script>-->
+    <script src="/sea.js"></script>
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>  
+    <script src="/gunadapter.js"></script>
+    -->
     
   </head>
   <body>
@@ -60,11 +64,11 @@
         </div>
 
         <div id="profile">
-            Public Key: <input id="aliaspublickey" readonly><button id="copypublickey">Copy</button>
+            Public Key: <input id="aliaspublickey" readonly size="90"><button id="copypublickey">Copy</button>
 
             <br>Profile:<label id="username"></label>
             <br>
-            <br>Access Public Key: <input id="accesskey" placeholder="public key"/> <label id="lookalias">None</label>
+            <br>Access Public Key: <input id="accesskey" placeholder="public key" size="90"/> <label id="lookalias">None</label>
             <br>Alias: <input id="inputalias" placeholder="value"/> 
             <button id="getalias"> Get Value </button>
             <button id="grantkey"> Grant (share key) </button> 
@@ -75,7 +79,13 @@
             <br>
             <br> Search Public Key:
             <br> <input id="inputsearchpublickey" placeholder="public key"/><label id="searchalias"> Alias: ?</label>
-            <br> Alias: <input id="dataalias" placeholder="value"/><button id="putvalue"> Put? </button>
+            <br> Alias: <input id="dataalias" placeholder="value"/><!--<button id="putvalue"> Put? </button>-->
+            <br> write share key: <input id="sharewrite" placeholder="value"/> 
+            <button id="btnwriteput"> Write put </button>
+            <button id="btnwriteget"> Write get? </button>
+            <button id="btnwriteaccess"> Write access </button>
+
+            <button id="btnwriteputvalue"> Write Put mix </button>
 
         </div>
 

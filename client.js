@@ -54,7 +54,11 @@ $.each(users,addusers);
 //===============================================
 // TEST GUN / USER
 $("#btngun").click(function(){
+    console.dir(Gun);
     console.log(gun);
+    //gun.get('~@test').once(ack=>{
+        //console.log(ack);
+    //});
 });
 $("#btnuser").click(function(){
     let user = gun.user();
@@ -174,7 +178,11 @@ $("#inputalias").keyup(function() {
 });
 $("#getalias").click(function(){
     let user = gun.user();
-    user.get('profile').get('alias').decryptonce(ack=>{
+    //user.get('profile').get('alias').decryptonce(ack=>{
+        //console.log(ack);
+    //});
+
+    user.get('profile').get('alias').once(ack=>{
         console.log(ack);
     });
 });
@@ -258,6 +266,78 @@ $("#putvalue").click(async function(){
         console.log("FAIL");
     }
 });
+
+//https://github.com/amark/gun/blob/master/lib/mix.js
+$("#btnwriteput").click(async function(){
+
+    let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#dataalias').val();// input text
+    let user = gun.user();
+    user.get('sharedata').get(user._.sea.pub).get('profile').get('alias').put({name:'test'},function(ack){
+        console.log(ack);
+    });
+});
+
+$("#btnwriteget").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#dataalias').val();// input text
+    let user = gun.user();
+    user.get('sharedata').get(user._.sea.pub).get('profile').get('alias').once(ack=>{
+        console.log(ack);
+    })
+});
+
+$("#btnwriteputvalue").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#dataalias').val();// input text
+    //gun/lib/mix.js
+    //Gun.state.node = function(node, vertex, opt){
+    let user = gun.user();
+    let to = gun.user(key);
+    
+    console.log(to);
+    let pub = await to.get('pub').then();
+    let to_publickey = key;
+    console.log(to_publickey);
+
+    //let to_alias = to.get('sharedata').get(user._.sea.pub).get('profile').get('alias');
+    let to_alias = to.get('sharedata').get(to_publickey).get('profile').get('alias');
+
+    //let user_alias = to.get('sharedata').get(user._.sea.pub).get('profile').get('alias');
+    let user_alias = user.get('sharedata').get(user._.sea.pub).get('profile').get('alias');
+    //let user_alias = to.get('sharedata').get(to_publickey).get('profile').get('alias');
+    //let user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
+    user_alias.put({name:"beta"},function(ack){
+        console.log(ack)
+    });
+    //user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
+    Gun.state.node(to_alias ,user_alias);
+});
+
+$("#btnwriteaccess").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#dataalias').val();// input text
+    //gun/lib/mix.js
+    //Gun.state.node = function(node, vertex, opt){
+    let user = gun.user();
+    let to = gun.user(key);
+    
+    console.log(to);
+    let pub = await to.get('pub').then();
+    let to_publickey = key;
+    console.log(to_publickey);
+
+    let user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
+    user_alias.put({name:"test"},function(ack){
+        console.log(ack)
+    });
+
+});
+
+
+
+
+
 $("#accesskey").keyup(async function() {
     let key = $('#accesskey').val();
     if(key.length == 0){console.log("EMPTY!");return;}
