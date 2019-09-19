@@ -460,6 +460,99 @@
         }());
         return gun;
     }
+
+    function encryptput01(data, cb, opt){
+        console.log("`.encryptput` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+        (async function(){
+            let enc, sec;
+            console.log(gun);
+            if(sharetype == "user"){
+                sec = await user.get('trust').get(pair.pub).get(path).then();
+                sec = await SEA.decrypt(sec, pair);
+                //console.log(sec);
+                if(!sec){
+                    console.log("CREATE SHARE KEY!");
+                    sec = SEA.random(16).toString();
+                    //sec = Gun.text.random(16);
+                    enc = await SEA.encrypt(sec, pair);
+                    user.get('trust').get(pair.pub).get(path).put(enc);
+                }
+                enc = await SEA.encrypt(data, sec);
+                let enc2 = await gun.then();
+                // value enc and public keys from current gun graph
+                //need to be convert into array not string 'SEA{...}' > {...}
+                let tmpp=enc;//json object
+                for(o in enc2){
+                    if("~" == o.slice(0,1)){
+                        console.log("FOUND PUB KEY");
+                        let tmppub = o;
+                        //console.log(tmppub);
+                        tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                        //console.log(tmpp);
+                    }
+                }
+                gun.put(tmpp, cb);
+                //console.log("enc",enc);
+                //gun.put(enc, cb);
+            }
+            //if user is not root graph
+            if(sharetype == "gun"){
+                let countmax = 10;//limit back to root loop
+                let root;
+                for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+                    let tmp = gun.back(i);//loop to find user root
+                    if(tmp._.soul){
+                        console.log("FOUND SOUL!");
+                        root = tmp;
+                        break;
+                    }
+                }
+                if(root !=null){
+                    let to = root;//user root graph
+                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                    let epub = await to.get('epub').then();
+                    let mix = await SEA.secret(epub, pair);
+                    let key = await SEA.decrypt(enc1, mix);//SECRET
+                    //console.log(key);
+                    //GET VALUE AND SHARE KEYS
+                    let enc2 = await gun.then();
+                    console.log(enc2);
+                    //ENCRYPT VALUE
+                    let enc3 = await SEA.encrypt(data, key);
+                    console.log(enc3);
+                    let enc0 = enc3;
+                    for(o in enc2){
+                        //if(o == "ct"){
+                            //tmpp[o] = enc0.ct;
+                        //}else if (o == "iv"){//ignore
+                            //tmpp[o] = enc0.iv;
+                        //}else if(o == "s"){//ignore
+                            //tmpp[o] = enc0.s;
+                        //}]
+                        if("~" == o.slice(0,1)){
+                            //console.log("FOUND PUB KEY");
+                            enc0 = Gun.obj.put(enc0, o, Gun.val.link.ify(o));
+                        }
+                    }
+                    console.log(enc0);
+                    gun.put(enc0, cb);
+                }
+            }
+        }());
+        return gun;
+    }
+
+
     function decryptonce( cb, opt){
         console.log("`.decryptonce` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -550,6 +643,7 @@
     Gun.chain.grantkey = grantkey;
     Gun.chain.revokekey = revokekey;
     Gun.chain.encryptput = encryptput;
+    Gun.chain.encryptput01 = encryptput01;
     Gun.chain.decryptonce = decryptonce;
     //TESTING...
     Gun.chain.trustlist = trustlist;

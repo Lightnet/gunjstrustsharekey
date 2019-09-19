@@ -113,3 +113,99 @@ each.nodetest = function(node, soul){
 console.log(g)
 Gun.obj.map(g._.put, each.nodetest);
 ```
+
+
+```
+Gun.chain.uuid = function(fn){
+  (this._.opt = this._.opt || {}).uuid = fn;
+  return this;
+}
+
+// use:
+var gun = Gun();
+gun.get('foo').uuid(function(){ return 'spam' }).put({a: {thisNodeShouldBeSpam: true}});
+console.log(gun._.graph);
+Obviously you'd have the fn return random/whatever IDs, not the same soul.
+```
+
+```
+var drop = gun.get('*');
+drop.on('out', function(msg){
+  if(msg.put){ delete msg.put['*'] }
+  this.to.next(msg);
+});
+
+// use:
+drop.put({
+ a: Gun.node.ify({foo: 'bar'}, 'a'), // or manually add the soul
+ b: Gun.node.ify({bar: 'foo'}, 'b')
+})
+// view:
+console.log(gun._.graph)
+so this is a chain adapter versus a wire adapter
+```
+
+
+```
+gun.get({'#': {'*': ''}})
+```
+
+```
+Gun.state.ify({}, 'b', 9, 'c', 'cool'); // node, key, state, value, soul
+```
+
+```
+@go1dfish if the nodes are related to each other (have edges), that'd work, but I'm guessing probably not. Which case, .put( API won't let you :(, but you can manually write a wire command:
+
+gun._.on('out', {
+    put: {
+        node1: {_:{'#':'node1','>':{...}},
+            hello: "world!"
+        },
+        node2: {_:{'#':node2','>':{...}},
+            hello: "world!"
+        }
+    }
+})
+Tho sounds like you're trying to avoid that? There are also a LOT of internal utility functions for constructing/building valid nodes and graphs, would those help?
+```
+
+```
+Gun.node.soul(this._.graph[Object.keys(this._.graph)[0]])
+
+```
+
+```
+(TEAM C) be @Kuirak_twitter @sirpy @Lightnet @mhelander @amark @wfcho211 on new SEA features
+(TEAM B) @jussiry @JamieRez @amark etc. on Meta Editor, Music, IDEs
+(TEAM A) p2p Uber / AirBnB stuff, etc.
+
+var gun = Gun();
+var dam = gun.back('opt.mesh');
+dam.hear['yo'] = function(msg, peer){
+  console.log('hi', msg);
+  //dam.say({dam: 'yo', foo: 'bar'}, peer); // only send back to peer
+  //dam.say({dam: 'yo', bar: 'everyone'}); // send to all directly connected peers
+}
+
+so replace 'yo' with whatever name you want your RPC module to be, and make sure when you send out messages (which you can do with dam) you have matching dam: 'yo' property, this is what stops the message from flooding into the rest of the network.
+DAM is just an adapter for GUN that makes writing transport plugins easy, kinda like RAD is suppose to make storage easy.
+
+or you mean on dam.say( ?
+that peer corresponds to the gun.back('opt.peers') list that you pass in from the GUN constructor, often your NodeJS superpeer
+so in the browser, with dam.say( (as long as you actually have a DAM set up to block the message on matching type) the message will only send to that neighbor peer (the NodeJS superpeer)
+
+so if you do dam.say({dam: 'rpc-name'}) then it sends to all neighbor peers, if you do dam.say({dam: 'rpc-name'}, refToGunTestPeer) it'll only send to the guntest peer not the other one.
+yeah, best to refer to config object
+var peers = gun.back('opt.peers')
+
+now those are what are called "up peers"
+if you have lib/webrtc.js included in your browser
+regardless of the "up peers" you explicitly pass in
+you might get connected to other dynamic peers
+in which case, the dam.say({...}) without 2nd param would send to all neighbor peers, some of whom might be dynamic from WebRTC
+in browser, you're probably not doing this
+but in NodeJS
+every single browser peer is a dynamic peer
+
+```
