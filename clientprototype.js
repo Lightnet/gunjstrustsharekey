@@ -383,29 +383,64 @@ $("#btnwriteputmix").click(async function(){
     if((who != null)&&(key.length > 0)){
         console.log("SET WRITE OWN");
         //add user at ref owner sharekey for write to write own to ref update graph.
-        user.get('sharedata').get(key).get('access').get('key').put("ASDF");
+        //user.get('sharedata').get(key).get('access').get('key').put("ASDF");
         //get graph path
         let rootpath = to.get('sharedata').get(key).get('access').get('key').graphpath();
         //time different
         let time = 0;
         //get list of users that trusted
-        to.get('trust').get(rootpath).once().map().once((data,k)=>{
+        
+        to.get('trust').get(rootpath).once().map().once((d,k)=>{
             //console.log(data);
             console.log(k);// user pulbic key
             //need to add check for write able.
             //look for ref for user each graph to check time added
             let ref = gun.user(k);
-            ref.get('sharedata').get(key).get('access').get('key').once((d1,k1)=>{
-                console.log(d1);
-                console.log(k1);
+            //does not get time data
+            //ref.get('sharedata').get(key).get('access').once().map().once(function(data,key){
+                //console.log(data);
+            //});
+            //does not get data
+            //ref.get('sharedata').get(key).get('access').get('key').on(function(data, key, at, ev){
+                //ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
+                //ev.off();
+                //console.log("data");
+                //console.log(data);
+            //});
+
+            let lastest_time = 0;
+
+            ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
+                //ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
+                //ev.off();
+                console.log("data");
+                console.log(data);
+                //compare path graph of each users. check latest write
+                //check for key graph > ref.get('sharedata').get('public own key').get('access').get('key')
+                if( data['_']['>']['key'] >= lastest_time){
+                    lastest_time = data['_']['>']['key'];
+                    console.log(lastest_time);
+                }
+                //console.log(key);
+                //console.log(at);
+                //console.log(ev);
+                //Gun.node.is(data, async function(v, k){
+
+                //});
+            });
+                
+            //ref.get('sharedata').get(key).get('access').get('key').once((d1,k1)=>{
+                //console.log(d1);
+                //console.log(k1);
                 //Gun.node.is(d1, async function(v3, k3){
                     //console.log("v3",v3);
                     //console.log("k3",k3);
                 //});
-            });
+            //});
 
             //do some compare data
         });
+        
     }
 });
 

@@ -209,3 +209,12 @@ but in NodeJS
 every single browser peer is a dynamic peer
 
 ```
+
+
+
+
+```
+@Lightnet yes it is:
+Gun.state.is(dataNode, key)
+so for instance Gun.state.is({a:'lol', _:{'>': {a: 9}}}, 'a') returns 9
+```
