@@ -1,3 +1,4 @@
+:point_up: [September 19, 2019 2:32 AM](https://gitter.im/amark/gun?at=5d834b1e901bb84d9034efd8)
 
 let to = gun.user('user public key');
 to.get('sharedata').get('path...').get('foo').put('Sea{}'); //just idea

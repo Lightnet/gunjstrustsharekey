@@ -74,3 +74,43 @@ let bob = bob.get('sharedData').get('aliceKey').get('profile').get('alias').put(
 ```
 
 Symmetric, so bob has shareddata/groupkey or shareddata/alice and alice has shareddata/groupkey, shareddata/bob
+
+
+https://gist.github.com/amark/44b8110a3c848917d6c738f9c3a36e24
+```
+
+$('#search').on('blur', function(e){
+  var s = LI.search = $(this).val();
+  var find = gun.user(s);
+  find.get('profile').on(function(data, key, at, ev){
+    if(s !== LI.search){
+      ev.off();
+      return;
+    }
+    Gun.node.is(data, async function(v, k){
+      if(k === LI.busy){ return }
+      var key = await find.get('trust').get(user.pair().pub).get(k+'profile').then();
+      var mix = await Gun.SEA.secret(await find.get('epub').then(), user.pair());
+      key = await Gun.SEA.decrypt(key, mix);
+      var val = await Gun.SEA.decrypt(v, key);
+      $('#'+k).val(val || v);
+    });
+  });
+});
+```
+
+```
+for(o in enc2){
+    //if(o == "ct"){
+        //tmpp[o] = enc0.ct;
+    //}else if (o == "iv"){//ignore
+        //tmpp[o] = enc0.iv;
+    //}else if(o == "s"){//ignore
+        //tmpp[o] = enc0.s;
+    //}]
+    if("~" == o.slice(0,1)){
+        //console.log("FOUND PUB KEY");
+        enc0 = Gun.obj.put(enc0, o, Gun.val.link.ify(o));
+    }
+}
+```

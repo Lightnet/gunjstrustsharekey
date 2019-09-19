@@ -3,7 +3,7 @@
     Created by: Lightnet
     License: MIT
     Version: 3.0
-    Last Update:2019.08.17
+    Last Update:2019.09.19
 
     Credit: amark ( https://github.com/amark/gun)
 
@@ -76,8 +76,17 @@
         (async function(){
             //make sure that user root
             if(sharetype == "user"){
-                let data = await gun.then();
-                console.log(data);
+                //let data = await gun.then();
+                //console.log(data);
+                user.get('trust').get(path).once().map().once((data,key)=>{
+                    console.log("trust");
+                    console.log(data);
+                    console.log(key);
+                    //Gun.node.is(data, async function(v, k){
+                        //console.log(v)
+                        //console.log(k)
+                    //});
+                });
             }
             //if(sharetype == "gun"){}
         }());
@@ -102,16 +111,7 @@
         }
         let each = {};
         (async function(){
-            //if (Gun.is(user)) {
-                //user.get('pub').get((ctx, ev) => {
-                  //console.log(ctx, ev);
-                //});
-                //let pub = await user.get('pubs').then();
-                //console.log(pub);
-            //}
-            //make sure that user root
-            
-            
+
             if(sharetype == "user"){
                 //console.log(gun);
                 //sea.js
@@ -122,29 +122,17 @@
                 //tmp = Gun.val.link.ify(tmp);
                 //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
                 //console.log(tmp);
+
                 let who = await to.get('alias').then();
                 if(who!=null){
-                    console.log("FOUND!",who);
                     let pub = await to.get('pub').then();
-                    let sec = await gun.then();
-                    console.log(sec);
-                    //let tagalias = '~@'+who;
-                    //sec = Gun.obj.put(sec, tagalias, Gun.val.link.ify(tagalias));
-                    let tagpub = '~'+pub;
-                    sec = Gun.obj.put(sec, tagpub, Gun.val.link.ify(tagpub));
-                    //Example: {_:#~asdf, hello:'world'~fdsa}}
-                    gun.put(sec,cb);
-                    let tmp = tagpub;
-                    gun.back().put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp)));
-                    gun.put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp)));
+                    user.get('trust').get(path).get(pub).put({write:true},ack=>{
+                        console.log("trust");
+                        console.log(ack);
+                    });
                 }
-
-                //let r = gun.back(-1);
-                //console.log(r);
                 console.log("done!");
             }
-            
-            
             //if(sharetype == "gun"){}
         }());
         return gun;
@@ -173,38 +161,10 @@
                 if(who!=null){
                     console.log("FOUND!",who);
                     let pub = await to.get('pub').then();
-                    let enc1 = await gun.then();//value
-                    let tagpub = "~@"+pub;//PUBLIC KEY MATCH FOR DISTRUST LIST
-                    //ENC VALUE AND ALIAS KEYS
-                    let sec = await user.get('trust').get(pair.pub).get(path).then();
-                    sec = await SEA.decrypt(sec, pair);
-                    //console.log(sec);
-                    //DECRYPT VALUE
-                    let gvalue = await SEA.decrypt(enc1, sec);
-                    gun.put(gvalue, cb);//reset to clear map list else it will not revoke public key
-                    //console.log(value);
-                    //ENCRYPT VALUE
-                    gvalue = await SEA.encrypt(gvalue, sec);
-                    //console.log(typeof value);
-                    if((typeof gvalue != 'object') && ("SEA" == gvalue.slice(0,3)) ){
-                        //console.log('FOUND!');
-                        gvalue = gvalue.substring(3, gvalue.length);
-                        gvalue = JSON.parse(gvalue)
-                        //console.log(enc);
-                    }
-                    let tmpp=gvalue;//json object
-                    for(o in enc1){
-                        if("~@" == o.slice(0,2)){//check if public key tag
-                            let tmppub = o;
-                            if(tmppub == tagpub){//revoke to skip public key
-                                //console.log("FOUND REVOKE!");
-                            }else{
-                                tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                            }
-                        }
-                    }
-                    //console.log(tmpp);
-                    gun.put(tmpp, cb);
+                    user.get('trust').get(path).get(pub).put({write:false},ack=>{
+                        console.log("trust");
+                        console.log(ack);
+                    });
                 }
             }
 
@@ -233,20 +193,20 @@
         }
         (async function(){
             if(sharetype == "user"){
-                let enc, sec = await user.get('trust').get(pair.pub).get(path).then();
+                let enc, sec = await user.get('grant').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 if(!sec){
                     sec = SEA.random(16).toString();
                     //sec = Gun.text.random(16);
                     enc = await SEA.encrypt(sec, pair);
-                    user.get('trust').get(pair.pub).get(path).put(enc);
+                    user.get('grant').get(pair.pub).get(path).put(enc);
                 }
                 let pub = await to.get('pub').then();
                 let epub = await to.get('epub').then();
                 pub = await pub; epub = await epub;
                 let dh = await SEA.secret(epub, pair);
                 enc = await SEA.encrypt(sec, dh);
-                user.get('trust').get(pub).get(path).put(enc, cb);
+                user.get('grant').get(pub).get(path).put(enc, cb);
             }
         }());
         return gun;
@@ -276,7 +236,7 @@
                     return gun;
                 }
                 let enc, sec;
-                sec = await user.get('trust').get(pair.pub).get(path).then();
+                sec = await user.get('grant').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 let key = await gun.once().then();
                 //GET VALUE
@@ -286,13 +246,13 @@
                 //sec = Gun.text.random(16);
                 enc = await SEA.encrypt(sec, pair);
                 //ENCRYPT KEY
-                user.get('trust').get(pair.pub).get(path).put(enc);
+                user.get('grant').get(pair.pub).get(path).put(enc);
                 let pub = await to.get('pub').then();
                 console.log("pub",pub);
                 console.log("path: ",path)
-                user.get('trust').once().map().once(async (data,mkey)=>{//trust users
+                user.get('grant').once().map().once(async (data,mkey)=>{//grant users
                     //console.log(data)
-                    //let p = await user.get('trust').get(mkey).then();
+                    //let p = await user.get('grant').get(mkey).then();
                     //console.log(p)
                     let uname;
                     uname = await gun.back(-1).user(mkey).get('alias').then();
@@ -308,7 +268,7 @@
                             //for (var p in op) {
                                 //console.log(p);
                             //}
-                            let ckey = await user.get('trust').get(mkey).get(path).then();
+                            let ckey = await user.get('grant').get(mkey).get(path).then();
                             if(ckey != "null"){//Check if there user are revoke key if they are null should be ignore.
                                 //console.log(uname, "CREATE NEW SALT SHARE KEY ");
                                 let mto = gun.back(-1).user(mkey);
@@ -318,7 +278,7 @@
                                 let menc = await SEA.encrypt(sec, dh);
                                 //NEW SALT KEY
                                 //console.log( uname,"NEW SHARE KEY: ",menc);
-                                user.get('trust').get(mpub).get(path).put(menc);
+                                user.get('grant').get(mpub).get(path).put(menc);
                             }
                         }
                     }
@@ -328,7 +288,7 @@
                 gun.put(v, cb);
                 // Remove Salt Key
                 //let pub = await to.get('pub').then();
-                user.get('trust').get(pub).get(path).put("null", cb);//remove key
+                user.get('grant').get(pub).get(path).put("null", cb);//remove key
             }
         }());
         return gun;
@@ -354,7 +314,7 @@
             let enc, sec;
             console.log(gun);
             if(sharetype == "user"){
-                sec = await user.get('trust').get(pair.pub).get(path).then();
+                sec = await user.get('grant').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 //console.log(sec);
                 if(!sec){
@@ -362,7 +322,7 @@
                     sec = SEA.random(16).toString();
                     //sec = Gun.text.random(16);
                     enc = await SEA.encrypt(sec, pair);
-                    user.get('trust').get(pair.pub).get(path).put(enc);
+                    user.get('grant').get(pair.pub).get(path).put(enc);
                 }
                 enc = await SEA.encrypt(data, sec);
                 let enc2 = await gun.then();
@@ -370,15 +330,15 @@
                 //need to be convert into array not string 'SEA{...}' > {...}
                 let tmpp=enc;//json object
                 //tmpp=
-                for(o in enc2){
-                    if("~" == o.slice(0,1)){
-                        console.log("FOUND PUB KEY");
-                        let tmppub = o;
+                //for(o in enc2){
+                    //if("~" == o.slice(0,1)){
+                        //console.log("FOUND PUB KEY");
+                        //let tmppub = o;
                         //console.log(tmppub);
-                        tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
+                        //tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
                         //console.log(tmpp);
-                    }
-                }
+                    //}
+                //}
                 gun.put(tmpp, cb);
                 //console.log("enc",enc);
                 //gun.put(enc, cb);
@@ -397,7 +357,7 @@
                 }
                 if(root !=null){
                     let to = root;//user root graph
-                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                    let enc1 = await to.get('grant').get(pair.pub).get(path).then();
                     let epub = await to.get('epub').then();
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);//SECRET
@@ -409,46 +369,6 @@
                     let enc3 = await SEA.encrypt(data, key);
                     console.log(enc3);
                     let enc0 = enc3;
-                    //enc0={alias:enc0+"~alias"};
-                    //enc0={alias:enc0};
-                    //let keylist = {};
-                    //console.log(user);
-                    //list = Gun.obj.put(list, "~"+pair.pub, enc3+"~"+pair.pub);
-                    //list = Gun.obj.put(list, "~@beta", enc3+"~"+pair.pub);
-                    //list = Gun.obj.put(list, "~@beta", enc3+"~@beta");
-                    //list = Gun.obj.put(list, "alias", enc3+"~"+pair.pub);//nope
-                    //enc0 = list;
-                    //if("SEA" == enc0.slice(0,3)){
-                        //console.log('FOUND!');
-                        //enc0 = enc0.substring(3, enc0.length);
-                        //enc0 = JSON.parse(enc0)
-                    //}
-                    //enc0 ={pub:enc0+"~"+pair.pub}
-                    //enc0 ={alias:enc0+"~"+pair.pub}
-                    //enc0 ={alias:enc0+"~"+pair.pub}
-
-                    //enc0 = Gun.obj.put({}, "~"+pair.pub, enc0+"~"+pair.pub)
-                    //console.log("enc0");
-                    //console.log(enc0);
-                    //console.log(gun.back().get(gun._.get))
-                    //gun.back(1).get(gun._.get).get(enc0).get(pair.pub).put(true);
-                    //let tmpp={};
-                    //let tmpp=enc0;
-                    //console.log(gun._.get);
-                    //gun.back().get(gun._.get).get(enc0).get(pair.pub).put(true);
-                    for(o in enc2){
-                        //if(o == "ct"){
-                            //tmpp[o] = enc0.ct;
-                        //}else if (o == "iv"){//ignore
-                            //tmpp[o] = enc0.iv;
-                        //}else if(o == "s"){//ignore
-                            //tmpp[o] = enc0.s;
-                        //}]
-                        if("~" == o.slice(0,1)){
-                            //console.log("FOUND PUB KEY");
-                            enc0 = Gun.obj.put(enc0, o, Gun.val.link.ify(o));
-                        }
-                    }
                     console.log(enc0);
                     //enc0 = tmpp;
                     //gun.back().get('any'+user._.sea.pub+'alias').put(enc0);
@@ -461,97 +381,16 @@
         return gun;
     }
 
-    function encryptput01(data, cb, opt){
-        console.log("`.encryptput` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
+    function graphpath( cb, opt){
         cb = cb || function(ctx) { return ctx };
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let sharetype;
-        if (gun._.$ instanceof Gun.User){//check gun node is user object
-            sharetype = "user";
-        }else{
-            sharetype = "gun";
-        }
-        (async function(){
-            let enc, sec;
-            console.log(gun);
-            if(sharetype == "user"){
-                sec = await user.get('trust').get(pair.pub).get(path).then();
-                sec = await SEA.decrypt(sec, pair);
-                //console.log(sec);
-                if(!sec){
-                    console.log("CREATE SHARE KEY!");
-                    sec = SEA.random(16).toString();
-                    //sec = Gun.text.random(16);
-                    enc = await SEA.encrypt(sec, pair);
-                    user.get('trust').get(pair.pub).get(path).put(enc);
-                }
-                enc = await SEA.encrypt(data, sec);
-                let enc2 = await gun.then();
-                // value enc and public keys from current gun graph
-                //need to be convert into array not string 'SEA{...}' > {...}
-                let tmpp=enc;//json object
-                for(o in enc2){
-                    if("~" == o.slice(0,1)){
-                        console.log("FOUND PUB KEY");
-                        let tmppub = o;
-                        //console.log(tmppub);
-                        tmpp = Gun.obj.put(tmpp, tmppub, Gun.val.link.ify(tmppub))
-                        //console.log(tmpp);
-                    }
-                }
-                gun.put(tmpp, cb);
-                //console.log("enc",enc);
-                //gun.put(enc, cb);
-            }
-            //if user is not root graph
-            if(sharetype == "gun"){
-                let countmax = 10;//limit back to root loop
-                let root;
-                for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
-                    let tmp = gun.back(i);//loop to find user root
-                    if(tmp._.soul){
-                        console.log("FOUND SOUL!");
-                        root = tmp;
-                        break;
-                    }
-                }
-                if(root !=null){
-                    let to = root;//user root graph
-                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
-                    let epub = await to.get('epub').then();
-                    let mix = await SEA.secret(epub, pair);
-                    let key = await SEA.decrypt(enc1, mix);//SECRET
-                    //console.log(key);
-                    //GET VALUE AND SHARE KEYS
-                    let enc2 = await gun.then();
-                    console.log(enc2);
-                    //ENCRYPT VALUE
-                    let enc3 = await SEA.encrypt(data, key);
-                    console.log(enc3);
-                    let enc0 = enc3;
-                    for(o in enc2){
-                        //if(o == "ct"){
-                            //tmpp[o] = enc0.ct;
-                        //}else if (o == "iv"){//ignore
-                            //tmpp[o] = enc0.iv;
-                        //}else if(o == "s"){//ignore
-                            //tmpp[o] = enc0.s;
-                        //}]
-                        if("~" == o.slice(0,1)){
-                            //console.log("FOUND PUB KEY");
-                            enc0 = Gun.obj.put(enc0, o, Gun.val.link.ify(o));
-                        }
-                    }
-                    console.log(enc0);
-                    gun.put(enc0, cb);
-                }
-            }
-        }());
-        return gun;
+        //(async function(){
+        //}());
+        //return gun;
+        return path;
     }
-
 
     function decryptonce( cb, opt){
         console.log("`.decryptonce` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
@@ -573,7 +412,7 @@
         (async function(){
             //console.log(sharetype);
             if(sharetype == "user"){
-                let sec = await user.get('trust').get(pair.pub).get(path).then();
+                let sec = await user.get('grant').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 let key = await gun.then();
                 console.log(key)
@@ -610,7 +449,7 @@
                     //soul=SEA.opt.pub(root._.soul);
                     //let to = gun.user(soul);
                     let to = root;//user root graph
-                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                    let enc1 = await to.get('grant').get(pair.pub).get(path).then();
                     let epub = await to.get('epub').then();
                     let mix = await SEA.secret(epub, pair);
                     let key = await SEA.decrypt(enc1, mix);
@@ -643,8 +482,8 @@
     Gun.chain.grantkey = grantkey;
     Gun.chain.revokekey = revokekey;
     Gun.chain.encryptput = encryptput;
-    Gun.chain.encryptput01 = encryptput01;
     Gun.chain.decryptonce = decryptonce;
     //TESTING...
     Gun.chain.trustlist = trustlist;
+    Gun.chain.graphpath = graphpath;
 }());
