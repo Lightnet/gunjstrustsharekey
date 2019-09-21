@@ -64,9 +64,28 @@ function addusers(index, data) {
 $.each(users,addusers);
 //===============================================
 // TEST GUN / USER
-$("#btngun").click(function(){
+$("#btngun").click(async function(){
     console.dir(Gun);
     console.log(gun);
+
+    let user = gun.user();
+    let sec = await SEA.work("foo", "bar");
+    let mix = await SEA.encrypt("bar", sec);
+    mix = JSON.stringify(mix)
+    console.log(mix);
+    //gun.get('any'+user.is.pub+'graph').get('foo').put(mix);
+    gun.get(user.is.pub).get('foo').put(mix);
+
+    console.log(user.is.pub);
+
+    //gun.get('any'+user.is.pub+'graph').get('foo').once(ack=>{
+        //console.log(ack);
+    //});
+
+    gun.get(user.is.pub).get('foo').once((data,key)=>{
+        console.log(data);
+    });
+
     //gun.get('~@test').once(ack=>{
         //console.log(ack);
     //});
@@ -371,12 +390,32 @@ $("#btnmap").click(async function(){
 
 $("#btnwriteputmix").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#sharewrite').val();// input text
+    //gun/lib/mix.js
+    //Gun.state.node = function(node, vertex, opt){
+    let user = gun.user();
+    let to = gun.user(key);
+    console.log("WRITE SHARE:")
+    
+    let who = await to.get('alias').then();
+    console.log("who:",who)
+    if((who != null)&&(key.length > 0)){
+        console.log("SET WRITE OWN");
+        //add user at ref owner sharekey for write to write own to ref update graph.
+        user.get('sharedata').get(key).get('access').get('key').put(keyvalue, function(ack){
+            console.log(ack);
+        });
+    }
+});
+
+$("#btnwritegetmix").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
     //let keyvalue = $('#dataalias').val();// input text
     //gun/lib/mix.js
     //Gun.state.node = function(node, vertex, opt){
     let user = gun.user();
     let to = gun.user(key);
-    console.log("WRITE?")
+    console.log("WRITE SHARE:")
 
     let who = await to.get('alias').then();
     console.log("who:",who)
@@ -384,63 +423,64 @@ $("#btnwriteputmix").click(async function(){
         console.log("SET WRITE OWN");
         //add user at ref owner sharekey for write to write own to ref update graph.
         //user.get('sharedata').get(key).get('access').get('key').put("ASDF");
+
+        let time = 0;
+        let idgraph = "key";
+
         //get graph path
         let rootpath = to.get('sharedata').get(key).get('access').get('key').graphpath();
         //time different
-        let time = 0;
-        //get list of users that trusted
-        
-        to.get('trust').get(rootpath).once().map().once((d,k)=>{
-            //console.log(data);
-            console.log(k);// user pulbic key
-            //need to add check for write able.
-            //look for ref for user each graph to check time added
-            let ref = gun.user(k);
-            //does not get time data
-            //ref.get('sharedata').get(key).get('access').once().map().once(function(data,key){
-                //console.log(data);
-            //});
-            //does not get data
-            //ref.get('sharedata').get(key).get('access').get('key').on(function(data, key, at, ev){
-                //ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
-                //ev.off();
-                //console.log("data");
-                //console.log(data);
-            //});
+        user.get('sharedata').get(key).get('access').get('key').once(ack=>{
+            console.log("FROM CURRENT USER ROOT!");
+            console.log(ack);
+            console.log("=======!");
+        });
 
-            let lastest_time = 0;
+        let cat = {};
+        cat.idx = 0;
+        cat.count = 0;
+        cat.timegraph = 0;
+        cat.idgraph = "key"; //graph key id
+        cat.datagraph;
 
+        cat.ownpub=function(to){
+            to.get('trust').get(rootpath).once().map().once((d,k)=>{
+                cat.idx++;
+                let ref = gun.user(k);
+                cat.pub(ref);
+            })
+        }
+
+        cat.pub=function(ref){
+            //path for sharewrite
             ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
-                //ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
-                //ev.off();
+                ev.off();
                 console.log("data");
                 console.log(data);
-                //compare path graph of each users. check latest write
-                //check for key graph > ref.get('sharedata').get('public own key').get('access').get('key')
-                if( data['_']['>']['key'] >= lastest_time){
-                    lastest_time = data['_']['>']['key'];
-                    console.log(lastest_time);
+                //let bfound = false;
+                if( data['_']['>'][cat.idgraph] >= cat.timegraph){
+                    cat.timegraph = data['_']['>'][cat.idgraph];
+                    cat.datagraph = data[cat.idgraph];
+                    console.log(cat.datagraph);
+                    //bfound = true;
                 }
-                //console.log(key);
-                //console.log(at);
-                //console.log(ev);
-                //Gun.node.is(data, async function(v, k){
-
-                //});
+                cat.check();
             });
-                
-            //ref.get('sharedata').get(key).get('access').get('key').once((d1,k1)=>{
-                //console.log(d1);
-                //console.log(k1);
-                //Gun.node.is(d1, async function(v3, k3){
-                    //console.log("v3",v3);
-                    //console.log("k3",k3);
-                //});
-            //});
+        }
 
-            //do some compare data
-        });
-        
+        cat.check=function(){
+            cat.count++;
+            console.log("checking...");
+            console.log(`index: ${cat.idx}`);
+            console.log(`count: ${cat.count}`);
+
+            if(cat.idx == cat.count){//check for loop.
+                console.log("cat.datagraph");
+                console.log(cat.datagraph);
+            }
+        }
+
+        cat.ownpub(to);//call at to get latest graph id for value
     }
 });
 
