@@ -78,19 +78,46 @@
             if(sharetype == "user"){
                 //let data = await gun.then();
                 //console.log(data);
+                let index = 0;
                 user.get('trust').get(path).once().map().once((data,key)=>{
+                    index++;
                     console.log("trust");
-                    console.log(data);
-                    console.log(key);
+                    console.log("data",data);
+                    console.log("key",key);
                     //Gun.node.is(data, async function(v, k){
                         //console.log(v)
                         //console.log(k)
                     //});
+                    user.get('trust').get(path).get('index').put(index);
+                    console.log(index);
                 });
             }
             //if(sharetype == "gun"){}
         }());
         return gun;
+    }
+
+    function trustindex(cb, opt){
+        console.log("`.trustlist` PROTOTYPE API DO NOT USE, TESTING!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+        (async function(){
+            //make sure that user root
+            if(sharetype == "user"){
+                let index = await user.get('trust').get(path).get('index').then();
+                return index;
+            }else{
+                return null;
+            }
+        }());
     }
 
     function trustkey(to, cb, opt){
@@ -131,6 +158,15 @@
                         console.log(ack);
                     });
                 }
+                //note this might break code if there take long if more then 100 alias users
+                //update sync error not working.
+                //if other user has not added key value will not work
+                let index = 0;
+                user.get('trust').get(path).once().map().once((data,key)=>{
+                    index++;
+                    user.get('trust').get(path).get('index').put(index);
+                    console.log(index);
+                });
                 console.log("done!");
             }
             //if(sharetype == "gun"){}
@@ -485,5 +521,6 @@
     Gun.chain.decryptonce = decryptonce;
     //TESTING...
     Gun.chain.trustlist = trustlist;
+    Gun.chain.trustindex = trustindex;
     Gun.chain.graphpath = graphpath;
 }());

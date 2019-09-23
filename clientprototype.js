@@ -399,7 +399,7 @@ $("#btnwriteputmix").click(async function(){
     
     let who = await to.get('alias').then();
     console.log("who:",who)
-    if((who != null)&&(key.length > 0)){
+    if((who != null)){
         console.log("SET WRITE OWN");
         //add user at ref owner sharekey for write to write own to ref update graph.
         user.get('sharedata').get(key).get('access').get('key').put(keyvalue, function(ack){
@@ -429,6 +429,10 @@ $("#btnwritegetmix").click(async function(){
 
         //get graph path
         let rootpath = to.get('sharedata').get(key).get('access').get('key').graphpath();
+        //console.log("rootpath",rootpath);
+        let rootindex = await to.get('trust').get(rootpath).get('index').then();
+        //console.log("rootindex",rootindex);
+
         //time different
         user.get('sharedata').get(key).get('access').get('key').once(ack=>{
             console.log("FROM CURRENT USER ROOT!");
@@ -442,6 +446,7 @@ $("#btnwritegetmix").click(async function(){
         cat.timegraph = 0;
         cat.idgraph = "key"; //graph key id
         cat.datagraph;
+        cat.rootindex = rootindex - 1;
 
         cat.ownpub=function(to){
             to.get('trust').get(rootpath).once().map().once((d,k)=>{
@@ -474,7 +479,12 @@ $("#btnwritegetmix").click(async function(){
             console.log(`index: ${cat.idx}`);
             console.log(`count: ${cat.count}`);
 
-            if(cat.idx == cat.count){//check for loop.
+            //if(cat.idx == cat.count){//check for loop.
+                //console.log("cat.datagraph");
+                //console.log(cat.datagraph);
+            //}
+
+            if(cat.rootindex == cat.count){
                 console.log("cat.datagraph");
                 console.log(cat.datagraph);
             }
@@ -1062,7 +1072,6 @@ function leavePrivateChatRoom(){
     }
     privatesharekey="";
 }
-
 
 async function addPrivateChat(index, data){
     let user = gun.user();
