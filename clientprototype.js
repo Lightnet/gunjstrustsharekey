@@ -42,7 +42,8 @@ navigator.clipboard.addEventListener('clipboardchange', e => {
 // TESTING LOGIN / DO NOT USED PRODUCTION!
 var users=[];
 users.push({index:0,value:"beta",passphrase:"test"});
-users.push({index:1,value:"sss",passphrase:"test"});
+users.push({index:1,value:"alpha",passphrase:"test"});
+users.push({index:1,value:"delta",passphrase:"test"});
 users.push({index:2,value:"bbb",passphrase:"test"});
 users.push({index:3,value:"test",passphrase:"test"});
 $("#users").change(function(){
@@ -399,7 +400,7 @@ $("#btnwriteputmix").click(async function(){
     
     let who = await to.get('alias').then();
     console.log("who:",who)
-    if((who != null)){
+    if(who != null){
         console.log("SET WRITE OWN");
         //add user at ref owner sharekey for write to write own to ref update graph.
         user.get('sharedata').get(key).get('access').get('key').put(keyvalue, function(ack){
@@ -419,46 +420,74 @@ $("#btnwritegetmix").click(async function(){
 
     let who = await to.get('alias').then();
     console.log("who:",who)
-    if((who != null)&&(key.length > 0)){
+    if(who != null){
+        user.get('sharedata').get(key).get('access').get('key').once(function(ack){
+            console.log(ack);
+        });
+    }
+});
+
+$("#btngetlatestgraph").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    //let keyvalue = $('#dataalias').val();// input text
+    //gun/lib/mix.js
+    //Gun.state.node = function(node, vertex, opt){
+    let user = gun.user();
+    let to = gun.user(key);
+    console.log("WRITE SHARE:");
+
+    let who = await to.get('alias').then();
+    console.log("who:",who)
+    if((who != null)){
         console.log("SET WRITE OWN");
         //add user at ref owner sharekey for write to write own to ref update graph.
         //user.get('sharedata').get(key).get('access').get('key').put("ASDF");
-
-        let time = 0;
-        let idgraph = "key";
-
-        //get graph path
-        let rootpath = to.get('sharedata').get(key).get('access').get('key').graphpath();
-        //console.log("rootpath",rootpath);
-        let rootindex = await to.get('trust').get(rootpath).get('index').then();
-        //console.log("rootindex",rootindex);
-
-        //time different
-        user.get('sharedata').get(key).get('access').get('key').once(ack=>{
-            console.log("FROM CURRENT USER ROOT!");
-            console.log(ack);
-            console.log("=======!");
-        });
-
+        let rootpub = key;
         let cat = {};
         cat.idx = 0;
         cat.count = 0;
         cat.timegraph = 0;
-        cat.idgraph = "key"; //graph key id
+        cat.idgraph = 'key'; //graph key id
         cat.datagraph;
+
+        //get graph path
+        let rootpath = to.get('sharedata').get(rootpub).get('access').get(cat.idgraph).graphpath();
+        //console.log("rootpath",rootpath);
+        let rootindex = await to.get('trust').get(rootpath).get('index').then();
         cat.rootindex = rootindex - 1;
+        //cat.rootindex = rootindex;
+        //console.log("rootindex",rootindex);
+
+        //time different
+        //user.get('sharedata').get(rootpub).get('access').get(cat.idgraph).once(ack=>{
+            //console.log("FROM CURRENT USER ROOT!");
+            //console.log(ack);
+            //console.log("=======!");
+        //});
 
         cat.ownpub=function(to){
+            console.log("list pubs");
             to.get('trust').get(rootpath).once().map().once((d,k)=>{
                 cat.idx++;
-                let ref = gun.user(k);
-                cat.pub(ref);
+                //console.log(Gun.node.soul(key))
+                console.log(d);
+                //if(k != "index"){
+                    cat.pub(k);
+                //}
             })
         }
 
-        cat.pub=function(ref){
+        cat.pub=async function(publickey){
+            console.log("pub: ", publickey);
+            let ref = gun.user(publickey);
+            let who = await ref.get('alias').then();
+            if(!who)return;
+            console.log("pub who:",who);
+            let keygraph = await ref.get('sharedata').get(rootpub).get('access').get('key').then();
+            console.log(keygraph);
+
             //path for sharewrite
-            ref.get('sharedata').get(key).get('access').on(function(data, key, at, ev){
+            ref.get('sharedata').get(rootpub).get('access').on(function(data, key, at, ev){
                 ev.off();
                 console.log("data");
                 console.log(data);

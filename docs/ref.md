@@ -6,3 +6,5 @@ https://stackoverflow.com/questions/2950152/iterate-through-select-options/29501
 https://stackoverflow.com/questions/31593297/using-execcommand-javascript-to-copy-hidden-text-to-clipboard
 
 https://stackoverflow.com/questions/22528892/jquery-add-active-class-and-remove-active-from-other-element-on-click
+
+https://italonascimento.github.io/applying-a-timeout-to-your-promises/

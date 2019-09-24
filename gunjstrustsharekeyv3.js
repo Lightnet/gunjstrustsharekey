@@ -78,18 +78,22 @@
             if(sharetype == "user"){
                 //let data = await gun.then();
                 //console.log(data);
-                let index = 0;
-                user.get('trust').get(path).once().map().once((data,key)=>{
-                    index++;
-                    console.log("trust");
-                    console.log("data",data);
-                    console.log("key",key);
+                //let index = 0;
+                user.get('trust').get(path).once().map().once(async (data,key)=>{
+                    //index++;
+                    //console.log("trust");
+                    //console.log("data",data);
+                    //console.log("key",key);
+                    let to = gun.user(key);
+                    let who = await to.get('alias').then();
+                    console.log("who: ", who);
+
                     //Gun.node.is(data, async function(v, k){
                         //console.log(v)
                         //console.log(k)
                     //});
-                    user.get('trust').get(path).get('index').put(index);
-                    console.log(index);
+                    //user.get('trust').get(path).get('index').put(index);
+                    //console.log(index);
                 });
             }
             //if(sharetype == "gun"){}
@@ -157,18 +161,20 @@
                         console.log("trust");
                         console.log(ack);
                     });
+
+                    //note this might break code if there take long if more then 100 alias users
+                    //update sync error not working.
+                    //if other user has not added key value will not work
+                    let index = 0;
+                    user.get('trust').get(path).once().map().once((data,key)=>{
+                        index++;
+                        user.get('trust').get(path).get('index').put(index);
+                        console.log(index);
+                    });
+                    console.log("done!");
                 }
-                //note this might break code if there take long if more then 100 alias users
-                //update sync error not working.
-                //if other user has not added key value will not work
-                let index = 0;
-                user.get('trust').get(path).once().map().once((data,key)=>{
-                    index++;
-                    user.get('trust').get(path).get('index').put(index);
-                    console.log(index);
-                });
-                console.log("done!");
             }
+                
             //if(sharetype == "gun"){}
         }());
         return gun;
@@ -451,7 +457,7 @@
                 let sec = await user.get('grant').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 let key = await gun.then();
-                console.log(key)
+                //console.log(key);
                 if(key === undefined){
                     //console.log("FOUND NULL");
                     cb(undefined);
