@@ -66,27 +66,50 @@ $.each(users,addusers);
 //===============================================
 // TEST GUN / USER
 $("#btngun").click(async function(){
-    console.dir(Gun);
-    console.log(gun);
+    //console.dir(Gun);
+    //console.log(gun);
 
-    let user = gun.user();
-    let sec = await SEA.work("foo", "bar");
-    let mix = await SEA.encrypt("bar", sec);
-    mix = JSON.stringify(mix)
-    console.log(mix);
-    //gun.get('any'+user.is.pub+'graph').get('foo').put(mix);
-    gun.get(user.is.pub).get('foo').put(mix);
+    var list = gun.get('clist').get('list');
+    //list.set({name:"test1",x:0,y:0,z:0});
+    //list.set({name:"test3",x:0,y:0,z:0});
 
-    console.log(user.is.pub);
+    //list.get('123').put({name:"test1",x:1,y:0,z:0});
+    //list.get('223').put({name:"test2",x:2,y:0,z:0});
+    //list.get('323').put({name:"test3",x:3,y:0,z:0});
+    //list.get('423').put({name:"test4",x:3,y:0,z:0});
+    //console.log(list);
 
-    //gun.get('any'+user.is.pub+'graph').get('foo').once(ack=>{
-        //console.log(ack);
+    console.log(list._.map);
+
+    console.log(list._.next);
+    if(list._.next !=null){
+        //console.log(list._.next.length);
+        let i = 0;
+        for(var o in list._.next){
+            i++;
+            console.log(o);
+        }
+        console.log(i)
+    }
+    
+
+    //list.on(function(data,key){
+        //console.log('data',data);
+        //console.log('key',key);
     //});
 
-    gun.get(user.is.pub).get('foo').once((data,key)=>{
-        console.log(data);
+    list.once().map().once(function(data, key){
+        console.log("data > ", data);
+        //console.log("key > ", key);
     });
+    
+	//setTimeout(function(){ 
+        //console.log("init gun...");
+    //}, 1000);
+    
 
+
+    
     //gun.get('~@test').once(ack=>{
         //console.log(ack);
     //});
@@ -94,6 +117,21 @@ $("#btngun").click(async function(){
 $("#btnuser").click(function(){
     let user = gun.user();
     console.log(user);
+
+    //let user = gun.user();
+    //let sec = await SEA.work("foo", "bar");
+    //let mix = await SEA.encrypt("bar", sec);
+    //mix = JSON.stringify(mix)
+    //console.log(mix);
+    //gun.get('any'+user.is.pub+'graph').get('foo').put(mix);
+    //gun.get(user.is.pub).get('foo').put(mix);
+    //console.log(user.is.pub);
+    //gun.get('any'+user.is.pub+'graph').get('foo').once(ack=>{
+        //console.log(ack);
+    //});
+    //gun.get(user.is.pub).get('foo').once((data,key)=>{
+        //console.log(data);
+    //});
 });
 function setClipboard(value) {
     var tempInput = document.createElement("input");
@@ -483,8 +521,8 @@ $("#btngetlatestgraph").click(async function(){
             let who = await ref.get('alias').then();
             if(!who)return;
             console.log("pub who:",who);
-            let keygraph = await ref.get('sharedata').get(rootpub).get('access').get('key').then();
-            console.log(keygraph);
+            //let keygraph = await ref.get('sharedata').get(rootpub).get('access').get('key').then();
+            //console.log(keygraph);
 
             //path for sharewrite
             ref.get('sharedata').get(rootpub).get('access').on(function(data, key, at, ev){

@@ -25,6 +25,6 @@
     "gulp-concat": "^2.6.1",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-terser": "^1.2.0",
-    "gun": "^0.2019.915"
+    "gun": "0.2019.910"
   }
 }
