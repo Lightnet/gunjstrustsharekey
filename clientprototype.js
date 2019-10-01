@@ -69,7 +69,7 @@ $("#btngun").click(async function(){
     //console.dir(Gun);
     //console.log(gun);
 
-    var list = gun.get('clist').get('list');
+    var list = gun.get('clist');
     //list.set({name:"test1",x:0,y:0,z:0});
     //list.set({name:"test3",x:0,y:0,z:0});
 
@@ -77,6 +77,7 @@ $("#btngun").click(async function(){
     //list.get('223').put({name:"test2",x:2,y:0,z:0});
     //list.get('323').put({name:"test3",x:3,y:0,z:0});
     //list.get('423').put({name:"test4",x:3,y:0,z:0});
+    //list.get('523').put({name:"test5",x:3,y:0,z:0});
     //console.log(list);
 
     console.log(list._.map);
@@ -92,13 +93,19 @@ $("#btngun").click(async function(){
         console.log(i)
     }
     
-
     //list.on(function(data,key){
         //console.log('data',data);
         //console.log('key',key);
     //});
 
-    list.once().map().once(function(data, key){
+    //list.once().map().once(function(data, key){
+        //console.log("data > ", data);
+        //console.log("key > ", key);
+    //});
+
+    console.log(list.map())
+
+    list.map().once(function(data, key){
         console.log("data > ", data);
         //console.log("key > ", key);
     });
