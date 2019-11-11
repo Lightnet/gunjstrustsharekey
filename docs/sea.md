@@ -114,3 +114,41 @@ for(o in enc2){
     }
 }
 ```
+
+```
+:point_up: [October 6, 2019 11:01 AM](https://gitter.im/amark/gun?at=5d9a2bf249c7720aaf77d976)
+@nmaro 
+Oh yeah, figured it out! Feels a lot like a hack but it works XD
+Gun.SEA.sign({
+    '#': `anything~${pair.pub}.`,
+    '.': 'rel',
+    ':': {
+        "#": 'foo'
+    },
+    '>': +new Date()
+}, pair).then(signature => {
+    gun.get(`anything~${pair.pub}.`).get('rel').put(signature);
+});
+```
+
+```
+https://discordapp.com/channels/612645357850984470/612645357850984473/642628514989735943
+:point_up: [November 8, 2019 10:40 AM](https://gitter.im/amark/gun?at=5dc5b6944adf071a84f49298)
+@Lightnet about this subject, and how GUN core does not have push/pop/queue-like commands built in, so it would be better if you @whatsdis & @Lightnet team up and make a module for this that then everybody else here in the community can benefit from :slight_smile: and we can refer them your way whenever somebody new asks about this subject :smile: :D
+if you do an gun.off() that could mess up future .on() as a warning, which is why @Dletta 's on(data, key, message, event){ event.off() is better, (note: doing => this doesn't work)
+
+user owner list of pub sharekey
+ * pub1
+ * pub2
+ * pub3
+
+get key and push to new list to check key wait promise time
+ * reason uesr own readonly key can't get which latest key checks graph
+
+queue list get Rad:lex get first timestmap time wait
+
+return lastest key
+
+```
+
+

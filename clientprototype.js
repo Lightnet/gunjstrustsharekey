@@ -471,7 +471,7 @@ $("#btnwritegetmix").click(async function(){
         });
     }
 });
-
+//https://gist.github.com/Lightnet/836b4d29b8104e06c2dd558e4d591b28#file-clientprototype-js-L475-L569
 $("#btngetlatestgraph").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
     //let keyvalue = $('#dataalias').val();// input text
@@ -522,6 +522,15 @@ $("#btngetlatestgraph").click(async function(){
             })
         }
 
+        //query
+        cat.queue=function(){
+            //used RAD#LEX
+            //add user key and timestamp
+            let user = gun.user();
+            let glist = user.get('list');
+
+        }
+        //compare graph node time stamp
         cat.pub=async function(publickey){
             console.log("pub: ", publickey);
             let ref = gun.user(publickey);
