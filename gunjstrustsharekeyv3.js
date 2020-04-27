@@ -95,6 +95,9 @@
                     //user.get('trust').get(path).get('index').put(index);
                     //console.log(index);
                 });
+                console.log("user path");
+            }else{
+                console.log("gun path");
             }
             //if(sharetype == "gun"){}
         }());
@@ -142,7 +145,7 @@
         }
         let each = {};
         (async function(){
-
+            console.log("sharetype:", sharetype);
             if(sharetype == "user"){
                 //console.log(gun);
                 //sea.js

@@ -169,11 +169,15 @@ $("#aliaskeycopy").click(function(){
 //===============================================
 // LOGIN
 $("#btnlogin").click(function(){
+    //console.log("LOGIN......");
     let user = gun.user();
+    //console.log($('#alias').val());
+    //console.log($('#passphrase').val());
+    
     user.auth($('#alias').val(), $('#passphrase').val(),(ack)=>{//user login username and password
         if(ack.err){
             console.log(ack.err);
-            modalmessage(ack.err);
+            //modalmessage(ack.err);
         }else{
             //console.log(ack);
             //modalmessage(ack);
@@ -194,7 +198,10 @@ $("#btnlogin").click(function(){
             $("#navmenu").show();
         }
     });
+    
 });
+
+
 $("#btnforgot").click(function(){
     $('#login').hide();
     $('#forgot').show();
@@ -1356,3 +1363,50 @@ $('#btnprivatechatgrant').hide();
 $('#btnprivatechatrevoke').hide();
 $('#btnprivatechatleave').hide();
 //}());
+
+
+$('#testlist').click(function(){
+    console.log("test list");
+
+    var gunlist = gun.get("testlist");
+    var time = 0;
+    var userdata = null;
+
+    gunlist.map().once(function(data,key){
+        console.log(data,">>",key);
+
+        console.log(data['_']['>']['user']);
+        if(data['_']['>']['user'] > time){
+            userdata = data['user'];
+            time = data['_']['>']['user'];
+            console.log("update time data...");
+        }else{
+            console.log("not update...");
+        }
+
+    })
+
+
+});
+$('#updatelist').click(function(){
+    console.log("test build");
+    var gunlist = gun.get("testlist");
+    gunlist.get("k9iptwggAhfAjhE").put({user:"test3"});
+    //gunlist.set({user:"test"});
+    //gunlist.set({user:"test2"});
+});
+
+$('#updatelist2').click(function(){
+    console.log("test build");
+    var gunlist = gun.get("testlist");
+    gunlist.get("k9iptwgiBUAjn3y").put({user:"test3"});
+    //gunlist.set({user:"test"});
+    //gunlist.set({user:"test2"});
+});
+
+$('#buildlist').click(function(){
+    console.log("test build");
+    var gunlist = gun.get("testlist");
+    //gunlist.set({user:"test"});
+    //gunlist.set({user:"test2"});
+});

@@ -92,8 +92,6 @@ function setClipboard(value) {
   .catch(err => {
     console.log('Something went wrong', err);
   });
-
-
 }
 $("#aliaskeycopy").click(function(){
     let user = gun.user();
@@ -105,6 +103,8 @@ $("#aliaskeycopy").click(function(){
 // LOGIN
 $("#btnlogin").click(function(){
     let user = gun.user();
+    console.log($('#alias').val());
+    console.log($('#passphrase').val());
     user.auth($('#alias').val(), $('#passphrase').val(),(ack)=>{//user login username and password
         if(ack.err){
             console.log(ack.err);
