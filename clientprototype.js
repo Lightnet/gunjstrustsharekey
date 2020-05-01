@@ -114,9 +114,6 @@ $("#btngun").click(async function(){
         //console.log("init gun...");
     //}, 1000);
     
-
-
-    
     //gun.get('~@test').once(ack=>{
         //console.log(ack);
     //});
@@ -200,7 +197,6 @@ $("#btnlogin").click(function(){
     });
     
 });
-
 
 $("#btnforgot").click(function(){
     $('#login').hide();
@@ -416,6 +412,106 @@ $("#btnwriteget").click(async function(){
     }
 });
 
+
+
+
+$("#btnmainsharedatrust").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    if(key.length == 0){console.log("EMPTY!");return;}
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        user.get('sharedata').get('access').get('key').trustkey(to);
+    }else{
+        console.log("FAIL");
+    }
+});
+$("#btnmainsharedadistrust").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    if(key.length == 0){console.log("EMPTY!");return;}
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        user.get('sharedata').get('access').get('key').distrustkey(to);
+    }else{
+        console.log("FAIL");
+    }
+});
+
+
+
+
+$("#mainsharedatawrite").click(async function(){
+    //let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#mainsharedatainput').val();// input text
+    if(!keyvalue){
+        console.log("empty!");
+        return;
+    }
+    let user = gun.user();
+    //var seckey = await SEA.work("test", "test");
+    var msg = "test";
+    msg = keyvalue;
+    //var enc = await SEA.encrypt(msg, seckey);
+    //user.get('sharedata').get(user._.sea.pub).get('access').get('key').encryptput(msg);
+    user.get('sharedata').get('access').get('key').trustput(msg);
+});
+
+$("#mainsharedataread").click(async function(){
+    let user = gun.user();
+
+    user.get('sharedata').get('access').get('key').trustget((ack)=>{
+        $("#mainsharedatainput").val(ack);
+    });
+});
+
+$("#btnsubsharedatawrite").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    //need to loop user and key graph latest check
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    let user = gun.user();
+    if((who != null)){
+        //console.log("found!", who);
+        let pub = await to.get('pub').then();
+        //console.log(pub);
+        //user.get('sharedata').get(pub).get('access').get('key').encryptput("RANDOMASDF");
+        user.get('sharedata').get(pub).get('access').get('key').trustput("RANDOMASDF");
+    }else{
+        console.log("Not found!");
+    }
+});
+
+$("#btnsubsharedataread").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let user = gun.user();
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        console.log("found!", who);
+        let pub = await to.get('pub').then();
+        //user.get('sharedata').get(pub).get('access').get('key').decryptonce((ack)=>{
+            //console.log(ack);
+            //$("#sharewrite").val(ack);
+        //});
+
+        user.get('sharedata').get(pub).get('access').get('key').trustget((ack)=>{
+            console.log(ack);
+            $("#sharewrite").val(ack);
+        });
+
+    }else{
+        console.log("Not found!");
+    }
+});
+
+
 $("#btnsharetrustlist").click(async function(){
     let user = gun.user();
     user.get('sharedata').get(user._.sea.pub).get('access').get('key').trustlist();
@@ -480,6 +576,10 @@ $("#btnwritegetmix").click(async function(){
 });
 //https://gist.github.com/Lightnet/836b4d29b8104e06c2dd558e4d591b28#file-clientprototype-js-L475-L569
 $("#btngetlatestgraph").click(async function(){
+//===============================================
+//
+//===============================================
+
     let key = $('#inputsearchpublickey').val(); //public key
     //let keyvalue = $('#dataalias').val();// input text
     //gun/lib/mix.js
@@ -504,9 +604,10 @@ $("#btngetlatestgraph").click(async function(){
 
         //get graph path
         let rootpath = to.get('sharedata').get(rootpub).get('access').get(cat.idgraph).graphpath();
+        console.log("rootpath:",rootpath);
         //console.log("rootpath",rootpath);
-        let rootindex = await to.get('trust').get(rootpath).get('index').then();
-        cat.rootindex = rootindex - 1;
+        //let rootindex = await to.get('trust').get(rootpath).get('index').then();
+        //cat.rootindex = rootindex - 1;
         //cat.rootindex = rootindex;
         //console.log("rootindex",rootindex);
 
@@ -520,7 +621,7 @@ $("#btngetlatestgraph").click(async function(){
         cat.ownpub=function(to){
             console.log("list pubs");
             to.get('trust').get(rootpath).once().map().once((d,k)=>{
-                cat.idx++;
+                //cat.idx++;
                 //console.log(Gun.node.soul(key))
                 console.log(d);
                 //if(k != "index"){
@@ -553,6 +654,7 @@ $("#btngetlatestgraph").click(async function(){
                 console.log("data");
                 console.log(data);
                 //let bfound = false;
+                //check time stmap update and call back
                 if( data['_']['>'][cat.idgraph] >= cat.timegraph){
                     cat.timegraph = data['_']['>'][cat.idgraph];
                     cat.datagraph = data[cat.idgraph];
@@ -564,20 +666,22 @@ $("#btngetlatestgraph").click(async function(){
         }
 
         cat.check=function(){
-            cat.count++;
+            //this may not work will callback and compare
+            //cat.count++;
+
             console.log("checking...");
-            console.log(`index: ${cat.idx}`);
-            console.log(`count: ${cat.count}`);
+            //console.log(`index: ${cat.idx}`);
+            //console.log(`count: ${cat.count}`);
 
             //if(cat.idx == cat.count){//check for loop.
                 //console.log("cat.datagraph");
                 //console.log(cat.datagraph);
             //}
 
-            if(cat.rootindex == cat.count){
-                console.log("cat.datagraph");
-                console.log(cat.datagraph);
-            }
+            //if(cat.rootindex == cat.count){
+                //console.log("cat.datagraph");
+                //console.log(cat.datagraph);
+            //}
         }
 
         cat.ownpub(to);//call at to get latest graph id for value

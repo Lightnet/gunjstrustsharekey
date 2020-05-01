@@ -147,34 +147,23 @@
         (async function(){
             console.log("sharetype:", sharetype);
             if(sharetype == "user"){
-                //console.log(gun);
-                //sea.js
-                //line 792
-                //root.get(tmp = '~'+act.pair.pub).put(act.data); // awesome, now we can actually save the user with their public key as their ID.
-                //root.get('~@'+alias).put(Gun.obj.put({}, tmp, Gun.val.link.ify(tmp))); // next up, we want to associate the alias with the public key. So we add it to the alias list.
-                //let tmp = '~'+pair.pub;
-                //tmp = Gun.val.link.ify(tmp);
-                //tmp = Gun.obj.put({}, tmp, Gun.val.link.ify(tmp));
-                //console.log(tmp);
 
                 let who = await to.get('alias').then();
                 if(who!=null){
+                    let enc, sec = await user.get('trust').get(pair.pub).get(path).then();
+                    sec = await SEA.decrypt(sec, pair);
+                    if(!sec){
+                        sec = SEA.random(16).toString();
+                        //sec = Gun.text.random(16);
+                        enc = await SEA.encrypt(sec, pair);
+                        user.get('trust').get(pair.pub).get(path).put(enc);
+                    }
                     let pub = await to.get('pub').then();
-                    user.get('trust').get(path).get(pub).put({write:true},ack=>{
-                        console.log("trust");
-                        console.log(ack);
-                    });
-
-                    //note this might break code if there take long if more then 100 alias users
-                    //update sync error not working.
-                    //if other user has not added key value will not work
-                    let index = 0;
-                    user.get('trust').get(path).once().map().once((data,key)=>{
-                        index++;
-                        user.get('trust').get(path).get('index').put(index);
-                        console.log(index);
-                    });
-                    console.log("done!");
+                    let epub = await to.get('epub').then();
+                    pub = await pub; epub = await epub;
+                    let dh = await SEA.secret(epub, pair);
+                    enc = await SEA.encrypt(sec, dh);
+                    user.get('trust').get(pub).get(path).put(enc, cb);
                 }
             }
                 
@@ -189,10 +178,10 @@
         opt = opt || {};
         let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
         gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let debug = opt.debug || gun._.root.opt.sharekeydebug;
-        let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
-        let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
-        let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
+        //let debug = opt.debug || gun._.root.opt.sharekeydebug;
+        //let valueid = opt.valueid || gun._.root.opt.sharekeyvalue;
+        //let trustid = opt.trustid || gun._.root.opt.sharekeytrust;
+        //let bbase = opt.bbase || gun._.root.opt.sharekeybbase;
         let sharetype;
         if (gun._.$ instanceof Gun.User){//check gun node is user object
             sharetype = "user";
@@ -202,20 +191,249 @@
         let each = {};
         (async function(){
             if(sharetype == "user"){
-                let who = await to.get('alias').then();
-                if(who!=null){
-                    console.log("FOUND!",who);
-                    let pub = await to.get('pub').then();
-                    user.get('trust').get(path).get(pub).put({write:false},ack=>{
-                        console.log("trust");
-                        console.log(ack);
-                    });
+                let alias = await to.get("alias").then();
+                if(!alias){
+                    cb({err:'Error alias not found!'});
+                    return gun;
                 }
+                let enc, sec;
+                sec = await user.get('trust').get(pair.pub).get(path).then();
+                sec = await SEA.decrypt(sec, pair);
+                let key = await gun.once().then();
+                //GET VALUE
+                let value = await SEA.decrypt(key, sec);
+                // CREATE SHARE KEY
+                sec = SEA.random(16).toString();
+                //sec = Gun.text.random(16);
+                enc = await SEA.encrypt(sec, pair);
+                //ENCRYPT KEY
+                user.get('trust').get(pair.pub).get(path).put(enc);
+                let pub = await to.get('pub').then();
+                console.log("pub",pub);
+                console.log("path: ",path)
+                user.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                    //console.log(data)
+                    //let p = await user.get('grant').get(mkey).then();
+                    //console.log(p)
+                    let uname;
+                    uname = await gun.back(-1).user(mkey).get('alias').then();
+                    //console.log("mkey",mkey);
+                    uname = await gun.back(-1).user(mkey).get('alias').then();
+                    if(pair.pub != mkey){//check self user to be resalt
+                        if(pub == mkey){ //check user to be revoke
+                            //do nothing??? (revoke user)
+                            console.log(uname, "REVOKE USER!");
+                        }else{
+                            console.log(uname, "PASS");
+                            //let op = await user.get('trust').get(mkey).then();
+                            //for (var p in op) {
+                                //console.log(p);
+                            //}
+                            let ckey = await user.get('trust').get(mkey).get(path).then();
+                            if(ckey != "null"){//Check if there user are revoke key if they are null should be ignore.
+                                //console.log(uname, "CREATE NEW SALT SHARE KEY ");
+                                let mto = gun.back(-1).user(mkey);
+                                let mpub = await mto.get('pub').then();
+                                let mepub = await mto.get('epub').then();
+                                let dh = await SEA.secret(mepub, pair);
+                                let menc = await SEA.encrypt(sec, dh);
+                                //NEW SALT KEY
+                                //console.log( uname,"NEW SHARE KEY: ",menc);
+                                user.get('trust').get(mpub).get(path).put(menc);
+                            }
+                        }
+                    }
+                });
+                //ENCRYPT VALUE
+                let v = await SEA.encrypt(value, sec);
+                gun.put(v, cb);
+                // Remove Salt Key
+                //let pub = await to.get('pub').then();
+                user.get('trust').get(pub).get(path).put("null", cb);//remove key
             }
 
             if(sharetype == "gun"){
 
             }
+        }());
+        return gun;
+    }
+
+    function trustput(data, cb, opt){
+        console.log("`.distrustkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+        let each = {};
+        (async function(){
+            let cat = {};//this will deal with the functions calls as well variables to hold.
+            cat.time = 0;
+            cat.key;
+            let enc, sec;
+            console.log("sharetype:",sharetype);
+            if(sharetype == "user"){
+                //get the root owner node list to check user key
+                //loop users list to find user path key to check latest key
+                //get the latest graph
+                //get hash key
+                //put data from latest key sec to encrypt
+                //not if graph is not create for users will but null or error
+
+                //user.get('grant').get(pair.pub).get(path).put(enc);
+                //user.get('grant').once().map().once(async (data,mkey)=>{//grant users
+                    //public key
+                    //let ckey = await user.get('grant').get(mkey).get(path).then();
+                //});
+
+                cat.checklisttrust=function(){
+                    //note -> public key /  path / data
+                    //
+                    user.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                        console.log("//////////");
+                        //console.log(" KEY:",mkey);
+                        //console.log("data:",data);
+                        //console.log("PATH graph:",data[path]);
+                        //console.log("PATH graph:",data);
+                        let towho = gun.back(-1).user(mkey);
+                        let who = await towho.get('alias').then();
+                        if(who == null){
+                            return;
+                        }
+                        console.log("PUBLIC KEY:",mkey);
+                        console.log("WHO:",who);
+                        //console.log("data:",data);
+                        //console.log("PATH:",path);
+                        //console.log("PATH:>>>",data[path]);
+                        //if path is null for trust need to return fail???
+                        if(data[path]){//check for path and check key
+                            console.log("FOUND PATH");
+                            //need to get graph time
+                            let seckey = towho.get("sharedata").get(pair.pub).get(path).then();
+
+
+
+
+                            //console.log("//////////");
+                            //console.log(who);
+                            //console.log("data:",data);
+                            //console.log("PATH graph:",data[path]);  
+                        }else{
+                            console.log("NOT FOUND!");
+                        }
+                    });
+                }
+
+                cat.checklisttrust();
+
+                
+                //encrypt data once verity.
+                cat.encryptput=async function(){
+                    sec = await user.get('trust').get(pair.pub).get(path).then();
+                    sec = await SEA.decrypt(sec, pair);
+
+                    if(!sec){
+                        console.log("CREATE SHARE KEY!");
+                        sec = SEA.random(16).toString();
+                        //sec = Gun.text.random(16);
+                        enc = await SEA.encrypt(sec, pair);
+                        user.get('trust').get(pair.pub).get(path).put(enc);
+                    }
+                    //console.log(sec);
+                    //console.log(data);
+                    enc = await SEA.encrypt(data, sec);
+
+                    gun.put(enc, cb);
+                }
+                
+                cat.encryptput();
+            }
+
+            //if user is not root graph
+            if(sharetype == "gun"){
+                let countmax = 10;//limit back to root loop
+                let root;
+                for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+                    let tmp = gun.back(i);//loop to find user root
+                    if(tmp._.soul){
+                        console.log("FOUND SOUL!");
+                        root = tmp;
+                        break;
+                    }
+                }
+                if(root !=null){
+                    let to = root;//user root graph
+                    let enc1 = await to.get('grant').get(pair.pub).get(path).then();
+                    let epub = await to.get('epub').then();
+                    let mix = await SEA.secret(epub, pair);
+                    let key = await SEA.decrypt(enc1, mix);//SECRET
+                    //console.log(key);
+                    //GET VALUE AND SHARE KEYS
+                    let enc2 = await gun.then();
+                    console.log(enc2);
+                    //ENCRYPT VALUE
+                    let enc3 = await SEA.encrypt(data, key);
+                    console.log(enc3);
+                    let enc0 = enc3;
+                    console.log(enc0);
+                    //enc0 = tmpp;
+                    //gun.back().get('any'+user._.sea.pub+'alias').put(enc0);
+                    //gun.back().get('alias').put(enc0);
+                    gun.put(enc0, cb);
+                    //gun.put(enc, cb);
+                }
+            }
+
+        }());
+        return gun;
+    }
+
+    function trustget( cb, opt){
+        console.log("`.distrustkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
+        cb = cb || function(ctx) { return ctx };
+        opt = opt || {};
+        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+        let sharetype;
+        if (gun._.$ instanceof Gun.User){//check gun node is user object
+            sharetype = "user";
+        }else{
+            sharetype = "gun";
+        }
+        let each = {};
+        (async function(){
+            let cat = {};
+            console.log("sharetype:",sharetype);
+            if(sharetype == "user"){
+
+                cat.decrypput=async function(){
+                    let sec = await user.get('trust').get(pair.pub).get(path).then();
+                    sec = await SEA.decrypt(sec, pair);
+                    let key = await gun.then();
+                    //console.log(key);
+                    if(key === undefined){
+                        //console.log("FOUND NULL");
+                        cb(undefined);
+                        return gun;
+                    }
+                    //if(key.sea === undefined){
+                        //cb(undefined);
+                        //return gun;
+                    //}
+                    //key = key.sea;//TESTING....
+                    let value = await SEA.decrypt(key, sec);
+                    cb(value);
+                }
+
+                cat.decrypput();
+            }
+
         }());
         return gun;
     }
@@ -300,7 +518,7 @@
                     //let p = await user.get('grant').get(mkey).then();
                     //console.log(p)
                     let uname;
-                    uname = await gun.back(-1).user(mkey).get('alias').then();
+                    //uname = await gun.back(-1).user(mkey).get('alias').then();
                     //console.log("mkey",mkey);
                     uname = await gun.back(-1).user(mkey).get('alias').then();
                     if(pair.pub != mkey){//check self user to be resalt
@@ -370,7 +588,7 @@
                     user.get('grant').get(pair.pub).get(path).put(enc);
                 }
                 enc = await SEA.encrypt(data, sec);
-                let enc2 = await gun.then();
+                //let enc2 = await gun.then();
                 // value enc and public keys from current gun graph
                 //need to be convert into array not string 'SEA{...}' > {...}
                 let tmpp=enc;//json object
@@ -528,8 +746,13 @@
     Gun.chain.revokekey = revokekey;
     Gun.chain.encryptput = encryptput;
     Gun.chain.decryptonce = decryptonce;
+
+    Gun.chain.trustget = trustget;
+    Gun.chain.decryptonce = decryptonce;
+
+
     //TESTING...
     Gun.chain.trustlist = trustlist;
     Gun.chain.trustindex = trustindex;
-    Gun.chain.graphpath = graphpath;
+    Gun.chain.trustput = trustput;
 }());
