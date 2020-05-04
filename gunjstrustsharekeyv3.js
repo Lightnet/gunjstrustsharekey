@@ -104,29 +104,6 @@
         return gun;
     }
 
-    function trustindex(cb, opt){
-        console.log("`.trustlist` PROTOTYPE API DO NOT USE, TESTING!");
-        cb = cb || function(ctx) { return ctx };
-        opt = opt || {};
-        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
-        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        let sharetype;
-        if (gun._.$ instanceof Gun.User){//check gun node is user object
-            sharetype = "user";
-        }else{
-            sharetype = "gun";
-        }
-        (async function(){
-            //make sure that user root
-            if(sharetype == "user"){
-                let index = await user.get('trust').get(path).get('index').then();
-                return index;
-            }else{
-                return null;
-            }
-        }());
-    }
-
     function trustkey(to, cb, opt){
         console.log("`.trustkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -230,16 +207,14 @@
                     function getkey(_key){
                         return key;
                     }
-                    
-                    
                     //get trusted users
                     user.get('trust').once().map().once(async (data,mkey)=>{//grant users
-                        console.log();
+                        //console.log();
                         
                         if(data[path]){//check if path exist as well trust user
                             console.log("FOUND PATH!");
-                            let uname;
-                            uname = await gun.back(-1).user(mkey).get('alias').then();
+                            //let uname;
+                            //uname = await gun.back(-1).user(mkey).get('alias').then();
                             //console.log(uname);
 
                             let to = gun.back(-1).user(mkey); //user public key
@@ -285,9 +260,66 @@
             }
 
             if(sharetype == "gun"){
+                let countmax = 10;//limit back to root loop
+                let root;
+                for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+                    let tmp = gun.back(i);//loop to find user root
+                    if(tmp._.soul){
+                        console.log("FOUND SOUL!");
+                        root = tmp;
+                        break;
+                    }
+                }
+                if(root !=null){
+                    let to = root;//user root graph
+                    let enc1 = await to.get('trust').get(pair.pub).get(path).then();
+                    let epub = await to.get('epub').then();
+                    let pub = await to.get('pub').then();
+                    let mix = await SEA.secret(epub, pair);
+                    let pkey = await SEA.decrypt(enc1, mix);
+                    console.log(pkey);
 
+                    let promise = new Promise(function(resolve, reject) {
+                        let key;
+                        function setkey(_key){
+                            key = _key;
+                        }
+                        function getkey(_key){
+                            return key;
+                        }
+                        setTimeout(() => resolve(getkey()), 1000);
+                        to.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                            if(data[path]){//check if path exist as well trust user
+                                let topub = gun.back(-1).user(mkey); //user public key
+                                //user data / get owner key
+                                topub.get('key').get(pub).once(async (Adata,Akey)=>{
+                                    if(Adata['_'] == undefined){
+                                        return;
+                                    }
+                                    if( Adata['_']['>'][path] >= cat.timegraph){
+                                        cat.timegraph = Adata['_']['>'][path];
+                                        let Bdata = await SEA.decrypt(Adata[path], pkey);
+                                        console.log(Adata['_']['>'][path], Bdata);
+                                        setkey(Bdata);
+                                    }
+                                });
 
+                            }
+                        });
 
+                    });
+
+                    promise.then(
+                        function(result) { 
+                          /* handle a successful result */ 
+                          console.log(result);
+                          console.log("done here!");
+                          cb(result);
+                        },
+                        function(error) { /* handle an error */ }
+                    );
+
+                }
             }
 
         }());
@@ -365,32 +397,12 @@
 
                     //generate new key
                     let sec1 = SEA.random(16).toString();
-                    //console.log(sec1);
+                    console.log(sec1);
                     enc1 = await SEA.encrypt(sec1, key); 
                     //console.log(pair.pub);
                     //              current owner / path / Key
                     user.get('key').get(pub).get(path).put(enc1);// save latest key
 
-
-                    /*
-                    let enc2 = await gun.then();
-                    if(enc2 === undefined){
-                        //console.log("FOUND NULL");
-                        cb(undefined);
-                        return gun;
-                    }
-                    //if(enc2.sea === undefined){
-                        //cb(undefined);
-                        //return gun;
-                    //}
-                    //console.log(enc2);
-                    //enc2 = enc2.sea;//TESTING....
-                    console.log(enc2);
-                    //enc2 = "SEA"+ JSON.stringify(enc2);
-                    let value = await SEA.decrypt(enc2, key);
-                    //console.log(value);
-                    cb(value);
-                    */
                 }
             }
                 
@@ -1004,16 +1016,16 @@
     Gun.chain.encryptput = encryptput;
     Gun.chain.decryptonce = decryptonce;
 
-    Gun.chain.trustgenkey = trustgenkey;
-    Gun.chain.trustgetkey = trustgetkey;
-    Gun.chain.trustget = trustget;
+    Gun.chain.trustgenkey = trustgenkey; //gnerate key
+    Gun.chain.trustgetkey = trustgetkey; //get latest key graph node
+
+    Gun.chain.trustget = trustget; //
+    Gun.chain.trustput = trustput; //
 
     Gun.chain.graphpath = graphpath;
     Gun.chain.graphtime = graphtime;
 
-
     //TESTING...
     Gun.chain.trustlist = trustlist;
-    Gun.chain.trustindex = trustindex;
-    Gun.chain.trustput = trustput;
+    
 }());

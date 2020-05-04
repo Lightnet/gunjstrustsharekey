@@ -120,6 +120,7 @@ user.create($('#alias').val(), $('#passphrase').val(),(ack)=>{//create user and
     console.log(ack);//pass if created
   }
 });
+
 user.leave(opt, cb); //does not work, not yet implementation
 user.delete(alias, pass, cb) //does not work, not yet implementation
 user.recall({sessionStorage:true}, cb) // work
@@ -149,8 +150,8 @@ gun.user(publicKey).once(console.log)//get user data graph.
 
  ```javascript
   //need to create another user to work correctly.
-  let to = gun.user('user-public-key');//user read only
-  to.get('profile').put({foo:"bar"});//denied write not owner
+  let to = gun.user('user-public-key'); //user read only
+  to.get('profile').put({foo:"bar"}); //denied write not owner
  ```
  The graph sea.js create and auth has node security checks to prevent imposter editing it. But there is public access to read, write, edit, and delete(you can null them only for record history version). You can allow user to edit the owning user with permission with trust function (not yet implementation).
 
@@ -249,3 +250,13 @@ async function sharekey(to,cb){
 This same setup but with grant other user for share key setup added.
 
 work in progress...
+
+## Grant and Revoke access functions:
+ To grant and revoke access to users to read and write. Is very easy using prefix name in the graph and user root graph data.
+```javascript
+ user.get('grant').get('publickey').get('path').put('data');
+```
+  Only the owner has right to dis/allow access.
+
+## Trust functions:
+  It is base on grant and revoke access. It to add on to able to allow users to write new keys. But it will require promise delay time to query and compare graph latest node. Since there no indexing list in graph. In case of someone trying to access to key. It will generate new key.
