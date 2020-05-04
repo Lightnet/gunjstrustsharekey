@@ -1237,26 +1237,3 @@ $('#testlist').click(function(){
         }
     })
 });
-
-$('#updatelist').click(function(){
-    console.log("test build");
-    var gunlist = gun.get("testlist");
-    gunlist.get("k9iptwggAhfAjhE").put({user:"test3"});
-    //gunlist.set({user:"test"});
-    //gunlist.set({user:"test2"});
-});
-
-$('#updatelist2').click(function(){
-    console.log("test build");
-    var gunlist = gun.get("testlist");
-    gunlist.get("k9iptwgiBUAjn3y").put({user:"test3"});
-    //gunlist.set({user:"test"});
-    //gunlist.set({user:"test2"});
-});
-
-$('#buildlist').click(function(){
-    console.log("test build");
-    var gunlist = gun.get("testlist");
-    //gunlist.set({user:"test"});
-    //gunlist.set({user:"test2"});
-});

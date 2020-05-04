@@ -27,7 +27,7 @@
   
   To grant and revoke owner user key graph node for users that has permission read only access data. There are some basic function calls to add and remove permission to users from owner root access. It used map table list that the owner has right top level graph access.
  
-  The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value on reference graph. As well encrypt put and decrypt once key value to encode and decode owner as well other user but permission access read and write. It used the graph table as well users graph to get the latest graph path data store.
+  The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value on reference graph node and path. As well encrypt put and decrypt once key value to encode and decode owner as well other user but permission access read and write. It used the graph table. As well users graph nodes to get the latest graph path data store.
 
   Please note this script is test simple functions.
  
@@ -216,6 +216,28 @@ gun.get('o').map().once(function(value, key){
 ```
 
 It be used as trust keys and public keys that store who own user root.
+
+```
+  user (root)(login)
+    (trust) (map list)
+      (user public key)
+        (graph path )
+          (data store)
+  user (root)
+    (public key)
+      (path)
+        (data)
+  user (root)
+    (public key)
+      (path)
+        (data)
+  user (root)
+    (public key)
+      (path)
+        (data)
+```
+  This how data is access. Login owner has right to edit but can't edit other users but reference them.
+
 
 ```javascript
 async function createsharekeyy(){

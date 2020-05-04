@@ -42,7 +42,8 @@ navigator.clipboard.addEventListener('clipboardchange', e => {
 // TESTING LOGIN / DO NOT USED PRODUCTION!
 var users=[];
 users.push({index:0,value:"beta",passphrase:"test"});
-users.push({index:1,value:"sss",passphrase:"test"});
+users.push({index:1,value:"alpha",passphrase:"test"});
+users.push({index:1,value:"delta",passphrase:"test"});
 users.push({index:2,value:"bbb",passphrase:"test"});
 users.push({index:3,value:"test",passphrase:"test"});
 $("#users").change(function(){
@@ -64,9 +65,55 @@ function addusers(index, data) {
 $.each(users,addusers);
 //===============================================
 // TEST GUN / USER
-$("#btngun").click(function(){
-    console.dir(Gun);
-    console.log(gun);
+$("#btngun").click(async function(){
+    //console.dir(Gun);
+    //console.log(gun);
+
+    var list = gun.get('clist');
+    //list.set({name:"test1",x:0,y:0,z:0});
+    //list.set({name:"test3",x:0,y:0,z:0});
+
+    //list.get('123').put({name:"test1",x:1,y:0,z:0});
+    //list.get('223').put({name:"test2",x:2,y:0,z:0});
+    //list.get('323').put({name:"test3",x:3,y:0,z:0});
+    //list.get('423').put({name:"test4",x:3,y:0,z:0});
+    //list.get('523').put({name:"test5",x:3,y:0,z:0});
+    //console.log(list);
+
+    console.log(list._.map);
+
+    console.log(list._.next);
+    if(list._.next !=null){
+        //console.log(list._.next.length);
+        let i = 0;
+        for(var o in list._.next){
+            i++;
+            console.log(o);
+        }
+        console.log(i)
+    }
+    
+    //list.on(function(data,key){
+        //console.log('data',data);
+        //console.log('key',key);
+    //});
+
+    //list.once().map().once(function(data, key){
+        //console.log("data > ", data);
+        //console.log("key > ", key);
+    //});
+
+    console.log(list.map())
+
+    list.map().once(function(data, key){
+        console.log("data > ", data);
+        //console.log("key > ", key);
+    });
+    
+	//setTimeout(function(){ 
+        //console.log("init gun...");
+    //}, 1000);
+    
     //gun.get('~@test').once(ack=>{
         //console.log(ack);
     //});
@@ -74,6 +121,21 @@ $("#btngun").click(function(){
 $("#btnuser").click(function(){
     let user = gun.user();
     console.log(user);
+
+    //let user = gun.user();
+    //let sec = await SEA.work("foo", "bar");
+    //let mix = await SEA.encrypt("bar", sec);
+    //mix = JSON.stringify(mix)
+    //console.log(mix);
+    //gun.get('any'+user.is.pub+'graph').get('foo').put(mix);
+    //gun.get(user.is.pub).get('foo').put(mix);
+    //console.log(user.is.pub);
+    //gun.get('any'+user.is.pub+'graph').get('foo').once(ack=>{
+        //console.log(ack);
+    //});
+    //gun.get(user.is.pub).get('foo').once((data,key)=>{
+        //console.log(data);
+    //});
 });
 function setClipboard(value) {
     var tempInput = document.createElement("input");
@@ -93,6 +155,7 @@ function setClipboard(value) {
     console.log('Something went wrong', err);
   });
 }
+
 $("#aliaskeycopy").click(function(){
     let user = gun.user();
     if(!user.is)return;
@@ -101,14 +164,17 @@ $("#aliaskeycopy").click(function(){
 });
 //===============================================
 // LOGIN
+//===============================================
 $("#btnlogin").click(function(){
+    //console.log("LOGIN......");
     let user = gun.user();
-    console.log($('#alias').val());
-    console.log($('#passphrase').val());
+    //console.log($('#alias').val());
+    //console.log($('#passphrase').val());
+    
     user.auth($('#alias').val(), $('#passphrase').val(),(ack)=>{//user login username and password
         if(ack.err){
             console.log(ack.err);
-            modalmessage(ack.err);
+            //modalmessage(ack.err);
         }else{
             //console.log(ack);
             //modalmessage(ack);
@@ -130,6 +196,7 @@ $("#btnlogin").click(function(){
         }
     });
 });
+
 $("#btnforgot").click(function(){
     $('#login').hide();
     $('#forgot').show();
@@ -233,6 +300,7 @@ $("#grantkey").click(async function(){
         modalmessage("Grant access fail!");
     }
 });
+//USER REVOKE KEY
 $("#revokekey").click(async function(){
     let user = gun.user();
     let key = $('#accesskey').val();
@@ -249,38 +317,21 @@ $("#revokekey").click(async function(){
         modalmessage("Revoke access fail!");
     }
 });
-$("#trustkey").click(async function(){
+//USER GENERATE KEY
+$("#btnmainsharedatagenkey").click(async function(){
     let user = gun.user();
-    let key = $('#accesskey').val();
-    if(key.length == 0){console.log("EMPTY!");return;}
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS");
-        user.get('profile').get('alias').trustkey(to);
-    }else{
-        console.log("FAIL");
-    }
+    user.get('sharedata').get('access').get('key').trustgenkey();
 });
-$("#distrustkey").click(async function(){
+// USER GET KEY LATEST
+$("#btnmainsharedatalatestkey").click(async function(){
     let user = gun.user();
-    let key = $('#accesskey').val();
-    if(key.length == 0){console.log("EMPTY!");return;}
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS");
-        user.get('profile').get('alias').distrustkey(to);
-    }else{
-        console.log("FAIL");
-    }
+    user.get('sharedata').get('access').get('key').trustgetkey((ack)=>{
+        console.log("////==========");
+        console.log(ack);
+        console.log("////==========");
+    });
 });
-$("#trustlist").click(async function(){
-    let user = gun.user();
-    user.get('profile').get('alias').trustlist();
-});
+// 
 $("#putvalue").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
     let keyvalue = $('#dataalias').val();// input text
@@ -297,131 +348,127 @@ $("#putvalue").click(async function(){
         console.log("FAIL");
     }
 });
-
 //https://github.com/amark/gun/blob/master/lib/mix.js
-$("#btnwriteput").click(async function(){
-
-    let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#sharewrite').val();// input text
+//USER TRUST PUBLIC KEY
+$("#btnmainsharedatrust").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    if(key.length == 0){console.log("EMPTY!");return;}
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        user.get('sharedata').get('access').get('key').trustkey(to);
+    }else{
+        console.log("FAIL");
+    }
+});
+//USER DISTRUST PUBLIC KEY
+$("#btnmainsharedadistrust").click(async function(){
+    let user = gun.user();
+    let key = $('#accesskey').val();
+    if(key.length == 0){console.log("EMPTY!");return;}
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    //console.log(who);
+    if(who != null){
+        console.log("PASS");
+        user.get('sharedata').get('access').get('key').distrustkey(to);
+    }else{
+        console.log("FAIL");
+    }
+});
+// USER WRITE DATA
+$("#mainsharedatawrite").click(async function(){
+    //let key = $('#inputsearchpublickey').val(); //public key
+    let keyvalue = $('#mainsharedatainput').val();// input text
     if(!keyvalue){
         console.log("empty!");
         return;
     }
     let user = gun.user();
-    var seckey = await SEA.work("test", "test");
-    var msg = "test"
+    var msg = "test";
     msg = keyvalue;
-    var enc = await SEA.encrypt(msg, seckey);
-    user.get('sharedata').get(user._.sea.pub).get('profile').get('alias').put(enc,function(ack){
-        console.log(ack);
+    user.get('sharedata').get('access').get('key').trustput(msg);
+});
+// USER READ DATA
+$("#mainsharedataread").click(async function(){
+    let user = gun.user();
+    user.get('sharedata').get('access').get('key').trustget((ack)=>{
+        $("#mainsharedatainput").val(ack);
     });
 });
-
-$("#btnmap").click(async function(){
-    console.log(Gun.text.random());
-    let genid = Gun.text.random();
-    //gun.get('data').get(genid).put({name:"foo",foo:"bar"});
-    gun.get(genid).put({name:"foo",foo:"bar"});
-
-    function callback(data){
-        console.log(data);
-        
-    }
-    //gun.get({'#': {'>': '*'}, '%': 50000}).map().once(callback)
-    //gun.get('data').get({'.': {'>': genid}}).map().once(callback)
-    //gun.get('data').get({'.': {'>': "FztS1VqZoZQUkjosL6oyDf3G"}}).map().once(callback)
-    console.log(gun);
-    //gun.map().once(callback);
-
-    //Gun().put({foo: 'bar'}); 
-    //Gun().get('foo').once(ack=>{
-        //console.log(ack)
-    //}); 
-});
-$("#btnwriteget").click(async function(){
+// GUN SHARE WRITE
+$("#btnsubsharedatawrite").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#dataalias').val();// input text
-    let user = gun.user();
-    var seckey = await SEA.work("test", "test");
-
+    let keyvalue = $('#sharewrite').val(); //public key
+    if(!keyvalue){
+        console.log("empty!");
+        return;
+    }
     let to = gun.user(key);
     let who = await to.get('alias').then();
-
-    if((who != null)&&(keyvalue.length > 0)){
-        to.get('sharedata').get(key).get('profile').get('alias').once(async (ack)=>{
-            console.log(ack);
-            let data = await SEA.decrypt(ack, seckey);
-            console.log(data);
-            $("#sharewrite").val(data);
-        });
-        console.log("WHO",who);
+    //let user = gun.user();
+    if((who != null)){
+        //console.log("found!", who);
+        //let pub = await to.get('pub').then();
+        //console.log(pub);
+        to.get('sharedata').get('access').get('key').trustput(keyvalue);
     }else{
-        user.get('sharedata').get(user._.sea.pub).get('profile').get('alias').once(async (ack)=>{
-            console.log(ack);
-            let data = await SEA.decrypt(ack, seckey);
-            console.log(data);
-            $("#sharewrite").val(data);
-        });
-        console.log("OWNER");
+        console.log("Not found!");
     }
-
-    
 });
-
-$("#btnwriteputmix").click(async function(){
+// GUN SHARE READ
+$("#btnsubsharedataread").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
     let user = gun.user();
     let to = gun.user(key);
-    
-    console.log(to);
-    let pub = await to.get('pub').then();
-    let to_publickey = key;
-    console.log("to publickey:",to_publickey);
-    console.log("user publickey:",user._.sea.pub);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        //console.log("found!", who);
+        to.get('sharedata').get('access').get('key').trustget((ack)=>{
+            console.log(ack);
+            $("#sharewrite").val(ack);
+        });
 
-    var seckey = await SEA.work("test", "test");
-    var msg = "hello";
-    var enc = await SEA.encrypt(msg, seckey);
-
-    //let to_alias = to.get('sharedata').get(user._.sea.pub).get('profile').get('alias');
-    let to_alias = to.get('sharedata').get(to_publickey).get('profile').get('alias');
-
-    //let user_alias = to.get('sharedata').get(user._.sea.pub).get('profile').get('alias');
-    let user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
-    //let user_alias = to.get('sharedata').get(to_publickey).get('profile').get('alias');
-    //let user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
-    //user_alias.put({name:"beta"},function(ack){
-        //console.log(ack)
-    //});
-
-    //to_alias.encryptput01(enc);
-    user_alias.put(enc,function(ack){
-        console.log(ack);
-        //Gun.state.node(to_alias ,user_alias);
-    });
-
-    //user_alias.once(function(ack){
-        //console.log(ack);
-        //let mix = Gun.state.node(to_alias, ack);
-        //console.log(mix);
-        //to_alias.put(mix);
-        //console.log("testing...")
-        //to_alias.put(mix);
-    //});
-
-    let mix = Gun.state.node(to_alias, enc);
-    console.log(mix);
-    to_alias.put(mix);
-
-    //user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
-    //Gun.state.node(to_alias ,user_alias);
-    console.log("WRITE MIX");
-    
+    }else{
+        console.log("Not found!");
+    }
 });
+// GUN SHARE GENERATE KEY
+$("#btnsubsharedatagenkey").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let user = gun.user();
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        console.log("found!", who);
+        //let pub = await to.get('pub').then();
+        to.get('sharedata').get('access').get('key').trustgenkey();
 
+    }else{
+        console.log("Not found!");
+    }
+});
+// GUN SHARE GET KEY LATEST GRAPH
+$("#btnsubsharedalatestkey").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let user = gun.user();
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        console.log("found!", who);
+        let pub = await to.get('pub').then();
+        to.get('sharedata').get('access').get('key').trustgetkey((ack)=>{
+            console.log(ack);
+        });
+    }else{
+        console.log("Not found!");
+    }
+});
+//https://gist.github.com/Lightnet/836b4d29b8104e06c2dd558e4d591b28#file-clientprototype-js-L475-L569
+// CLIPBOARD PASTE
 $("#searchpublickeypaste").click(async function(){
     $('#inputsearchpublickey').focus();
     document.execCommand("paste");
@@ -443,30 +490,6 @@ $("#searchpublickeypaste").click(async function(){
         }
     });
 });
-$("#btnwriteaccess").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    
-    console.log(to);
-    let pub = await to.get('pub').then();
-    let to_publickey = key;
-    console.log(to_publickey);
-    var seckey = await SEA.work("test", "test");
-    var msg = "hellow";
-    var enc = await SEA.encrypt(msg, seckey);
-
-    let user_alias = user.get('sharedata').get(to_publickey).get('profile').get('alias');
-    console.log(enc);
-    user_alias.put(enc,function(ack){
-        console.log(ack)
-    });
-
-});
-
 
 $("#accesskey").keyup(async function() {
     let key = $('#accesskey').val();
@@ -764,6 +787,7 @@ $(window).resize(function() {
 MessagesResize();
 //===============================================
 // PUBLIC CHAT
+//===============================================
 var gunchat;
 function timestamp(){
     let currentDate = new Date();
@@ -991,7 +1015,6 @@ function leavePrivateChatRoom(){
     privatesharekey="";
 }
 
-
 async function addPrivateChat(index, data){
     let user = gun.user();
     console.log("add chat room list");
@@ -1192,3 +1215,25 @@ $('#btnprivatechatgrant').hide();
 $('#btnprivatechatrevoke').hide();
 $('#btnprivatechatleave').hide();
 //}());
+
+
+$('#testlist').click(function(){
+    console.log("test list");
+
+    var gunlist = gun.get("testlist");
+    var time = 0;
+    var userdata = null;
+
+    gunlist.map().once(function(data,key){
+        console.log(data,">>",key);
+
+        console.log(data['_']['>']['user']);
+        if(data['_']['>']['user'] > time){
+            userdata = data['user'];
+            time = data['_']['>']['user'];
+            console.log("update time data...");
+        }else{
+            console.log("not update...");
+        }
+    })
+});

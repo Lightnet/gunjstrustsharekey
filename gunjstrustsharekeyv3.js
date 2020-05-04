@@ -3,7 +3,7 @@
     Created by: Lightnet
     License: MIT
     Version: 3.0
-    Last Update:2019.09.24
+    Last Update:2020.05.04
 
     Credit: amark ( https://github.com/amark/gun)
 
@@ -141,17 +141,6 @@
                         let sec1 = SEA.random(16).toString();
                         let enc1 = await SEA.encrypt(sec1, sec); 
                         user.get('key').get(pair.pub).get(path).put(enc1); // 
-
-                        ///need to add graph key and data value key hash
-                        //let enc1 = await SEA.encrypt(secpair, sec);
-                        //console.log("enc1",enc1);
-                        //user.get('pair').get(pair.pub).get(path).put(enc1); //PAIR ENC
-                        //user.get('key').get(pair.pub).get(path).put(enc1); //
-                        //let sec1 = SEA.random(16).toString(); //GEN KEY
-                        //enc1 = await SEA.encrypt(sec1, secpair); // PAIR GEN
-                        //user.get('key').get(pair.pub).get(path).put(enc1);
-                        //enc = await SEA.encrypt(sec, secpair);
-                        //user.get('key').get(pair.pub).get(path).put(enc);
                     }
                     let pub = await to.get('pub').then();
                     let epub = await to.get('epub').then();
@@ -159,7 +148,7 @@
                     let dh = await SEA.secret(epub, pair);
                     enc = await SEA.encrypt(sec, dh);
                     user.get('trust').get(pub).get(path).put(enc, cb);
-                    console.log("TRUST");
+                    //console.log("TRUST");
                     //enc1 = await SEA.encrypt(sec1, secpair); // PAIR GEN
                     //user.get('key').get(pair.pub).get(path).put(enc1);
                 }
@@ -211,7 +200,7 @@
                     //get trusted users
                     user.get('trust').once().map().once(async (data,mkey)=>{//grant users
                         if(data[path]){//check if path exist as well trust user
-                            console.log("FOUND PATH!");
+                            //console.log("FOUND PATH!");
                             //let uname = await gun.back(-1).user(mkey).get('alias').then();
                             //console.log(uname);
                             let to = gun.back(-1).user(mkey); //user public key
@@ -240,9 +229,6 @@
                             //console.log();
                         }
                     });
-
-                    
-
                 });
                 promise.then(
                     function(result) { 
@@ -511,13 +497,7 @@
             let sec1;
             console.log("sharetype:",sharetype);
             if(sharetype == "user"){
-                //get the root owner node list to check user key
-                //loop users list to find user path key to check latest key
-                //get the latest graph
-                //get hash key
-                //put data from latest key sec to encrypt
-                //not if graph is not create for users will but null or error
-
+                //get key
                 sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
                 //console.log(sec);
@@ -532,11 +512,6 @@
                     let enc1 = await SEA.encrypt(sec1, sec); 
                     user.get('key').get(pair.pub).get(path).put(enc1);
                 }
-                //console.log(sec);
-                //let key2 = await user.get('key').get(pair.pub).get(path).then();
-                //console.log(key2);
-                //let enc1 = await SEA.decrypt(key2, sec); 
-                //console.log(enc1);
                 
                 let promise = new Promise(function(resolve, reject) {
                     let key;
@@ -550,14 +525,13 @@
                     //get trusted users
                     user.get('trust').once().map().once(async (data,mkey)=>{//grant users
                         if(data[path]){//check if path exist as well trust user
-                            console.log("FOUND PATH!");
-                            console.log(mkey);
-
+                            //console.log("FOUND PATH!");
+                            //console.log(mkey);
                             let to = gun.back(-1).user(mkey); //user public key
                             //let keycode = await to.get('key').get(pair.pub).get(path).then();
                             //console.log(keycode);
                             to.get('key').get(pair.pub).once(async (Adata,Akey)=>{
-                                console.log(Adata);
+                                //console.log(Adata);
                                 if(Adata[path] != null){
                                     //console.log("FOUND DATA >>> !!!");
                                     if( Adata['_']['>'][path] >= cat.timegraph){
@@ -578,8 +552,8 @@
                 promise.then(
                     async function(result) { 
                         /* handle a successful result */ 
-                        console.log("done here!");
-                        console.log(result);
+                        //console.log("done here!");
+                        //console.log(result);
                         //encode data
                         let enc1 = await SEA.encrypt(_data, result);
                         //place graph
@@ -593,7 +567,7 @@
             //if user is not root graph
             if(sharetype == "gun"){
                 
-                let countmax = 10;//limit back to root loop
+                let countmax = 10;//limit back to root loop for user
                 let root;
                 for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
                     let tmp = gun.back(i);//loop to find user root
@@ -624,25 +598,24 @@
                         //get trusted users
                         to.get('trust').once().map().once(async (data,mkey)=>{//grant users
                             if(data[path]){//check if path exist as well trust user
-                                console.log("FOUND PATH!");
-                                console.log(mkey);
-    
+                                //console.log("FOUND PATH!");
+                                //console.log(mkey);
                                 let tto = gun.back(-1).user(mkey); //user public key
                                 //let keycode = await to.get('key').get(pair.pub).get(path).then();
                                 //console.log(keycode);
                                 tto.get('key').get(pub).once(async (Adata,Akey)=>{
-                                    console.log(Adata);
+                                    //console.log(Adata);
                                     if(Adata==null){
                                         return;
                                     }
                                     if(Adata[path] != null){
-                                        console.log("FOUND DATA >>> !!!")
+                                        //console.log("FOUND DATA >>> !!!")
                                         if( Adata['_']['>'][path] >= cat.timegraph){
-                                            console.log("// TIME //");
+                                            //console.log("// TIME //");
                                             //update the latest time
                                             cat.timegraph = Adata['_']['>'][path];
                                             let Bdata = await SEA.decrypt(Adata[path], __key);
-                                            console.log(Adata['_']['>'][path], Bdata);
+                                            //console.log(Adata['_']['>'][path], Bdata);
                                             //cb(Bdata);
                                             //key = Bdata;
                                             setkey(Bdata);
@@ -655,8 +628,8 @@
                     promise.then(
                         async function(result) { 
                             /* handle a successful result */ 
-                            console.log("done here!");
-                            console.log(result);
+                            //console.log("done here!");
+                            //console.log(result);
                             //encode data
                             let enc1 = await SEA.encrypt(_data, result);
                             //place graph
@@ -693,52 +666,10 @@
             if(sharetype == "user"){
                 let sec = await user.get('trust').get(pair.pub).get(path).then();
                 sec = await SEA.decrypt(sec, pair);
-                console.log(sec);
+                //console.log(sec);
+                let promise;
 
-                let promise = new Promise(function(resolve, reject) {
-                    let key;
-                    function setkey(_key){
-                        key = _key;
-                    }
-                    function getkey(_key){
-                        return key;
-                    }
-                    setTimeout(() => resolve(getkey()), 1000);
-                    //get trusted users
-                    user.get('trust').once().map().once(async (data,mkey)=>{//grant users
-                        if(data[path]){//check if path exist as well trust user
-                            console.log("FOUND PATH!");
-                            let to = gun.back(-1).user(mkey); //user public key
-                            to.get('key').get(pair.pub).once(async (Adata,Akey)=>{
-                                //console.log(Adata);
-                                if( Adata['_']['>'][path] >= cat.timegraph){
-                                    //update the latest time
-                                    cat.timegraph = Adata['_']['>'][path];
-                                    //console.log(Adata['_']['>'][path]);
-                                    let Bdata = await SEA.decrypt(Adata[path], sec);
-                                    //console.log(Bdata);
-                                    console.log(Adata['_']['>'][path], Bdata);
-                                    //cb(Bdata);
-                                    //key = Bdata;
-                                    setkey(Bdata);
-                                }
-                            });
-                        }
-                    });
-                });
-                promise.then(
-                    function(result) { 
-                      /* handle a successful result */ 
-                      cat.key = result
-                      console.log("done here!");
-                      console.log(result);
-                      getlatestkeyvalue(result);
-                      //cb(result);
-                    },
-                    function(error) { /* handle an error */ }
-                );
-
-                function getlatestkeyvalue(__key){
+                cat.getlatestkey=function(){
                     promise = new Promise(function(resolve, reject) {
                         let key;
                         function setkey(_key){
@@ -751,7 +682,51 @@
                         //get trusted users
                         user.get('trust').once().map().once(async (data,mkey)=>{//grant users
                             if(data[path]){//check if path exist as well trust user
-                                console.log("FOUND PATH!");
+                                //console.log("FOUND PATH!");
+                                let to = gun.back(-1).user(mkey); //user public key
+                                to.get('key').get(pair.pub).once(async (Adata,Akey)=>{
+                                    //console.log(Adata);
+                                    if( Adata['_']['>'][path] >= cat.timegraph){
+                                        //update the latest time
+                                        cat.timegraph = Adata['_']['>'][path];
+                                        //console.log(Adata['_']['>'][path]);
+                                        let Bdata = await SEA.decrypt(Adata[path], sec);
+                                        //console.log(Bdata);
+                                        //console.log(Adata['_']['>'][path], Bdata);
+                                        //cb(Bdata);
+                                        //key = Bdata;
+                                        setkey(Bdata);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                    promise.then(
+                        function(result) { 
+                        /* handle a successful result */ 
+                        cat.key = result
+                        //console.log("done here!");
+                        //console.log(result);
+                        cat.getlatestkeyvalue(result);
+                        //cb(result);
+                        },
+                        function(error) { /* handle an error */ }
+                    );
+                }
+                cat.getlatestkeyvalue = function(__key){
+                    promise = new Promise(function(resolve, reject) {
+                        let key;
+                        function setkey(_key){
+                            key = _key;
+                        }
+                        function getkey(_key){
+                            return key;
+                        }
+                        setTimeout(() => resolve(getkey()), 1000);
+                        //get trusted users
+                        user.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                            if(data[path]){//check if path exist as well trust user
+                                //console.log("FOUND PATH!");
                                 let to = gun.back(-1).user(mkey); //user public key
                                 to.get('value').get(pair.pub).once(async (Adata,Akey)=>{
                                     //console.log(Adata);
@@ -765,7 +740,7 @@
                                             //console.log(Adata['_']['>'][path]);
                                             let Bdata = await SEA.decrypt(Adata[path], __key);
                                             //console.log(Bdata);
-                                            console.log(Adata['_']['>'][path], Bdata);
+                                            //console.log(Adata['_']['>'][path], Bdata);
                                             //cb(Bdata);
                                             //key = Bdata;
                                             setkey(Bdata);
@@ -780,14 +755,14 @@
                         function(result) { 
                           /* handle a successful result */ 
                           cat.key = result
-                          console.log("done here! Value");
-                          console.log(result);
+                          //console.log("done here! Value");
+                          //console.log(result);
                           cb(result);
                         },
                         function(error) { /* handle an error */ }
                     );
-
                 }
+                cat.getlatestkey();
             }
 
             if(sharetype == "gun"){
@@ -809,66 +784,10 @@
                     let pub = await to.get('pub').then();
                     let mix = await SEA.secret(epub, pair);
                     let __key = await SEA.decrypt(enc1, mix);//SECRET
-                    console.log(__key);
+                    //console.log(__key);
 
-                    let promise = new Promise(function(resolve, reject) {
-                        let key;
-                        function setkey(_key){
-                            key = _key;
-                        }
-                        function getkey(_key){
-                            return key;
-                        }
-                        setTimeout(() => resolve(getkey()), 1000);
-                        //get trusted users
-                        to.get('trust').once().map().once(async (data,mkey)=>{//grant users
-                            if(data[path]){//check if path exist as well trust user
-                                //console.log("FOUND PATH!");
-                                //console.log(mkey);
-    
-                                let tto = gun.back(-1).user(mkey); //user public key
-                                //let keycode = await to.get('key').get(pair.pub).get(path).then();
-                                //console.log(keycode);
-                                tto.get('key').get(pub).once(async (Adata,Akey)=>{
-                                    //console.log(Adata);
-                                    if(Adata==null){
-                                        return;
-                                    }
-                                    if(Adata[path] != null){
-                                        console.log("FOUND DATA >>> !!!")
-                                        if( Adata['_']['>'][path] >= cat.timegraph){
-                                            //console.log("// TIME //");
-                                            //update the latest time
-                                            cat.timegraph = Adata['_']['>'][path];
-                                            let Bdata = await SEA.decrypt(Adata[path], __key);
-                                            //console.log(Adata['_']['>'][path], Bdata);
-                                            //cb(Bdata);
-                                            //key = Bdata;
-                                            setkey(Bdata);
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    });
-                    promise.then(
-                        async function(result) { 
-                            /* handle a successful result */ 
-                            console.log("///////// done here!");
-                            console.log(result);
-                            //encode data
-                            //let enc1 = await SEA.encrypt(__key, result);
-                            //place graph
-                            //cb(result);
-                            cat.timegraph = 0;
-                            console.log(".............................");
-                            getlatestkeyvalue(result);
-                            
-                        },
-                        function(error) { /* handle an error */ }
-                    );
-
-                    function getlatestkeyvalue(__key){
+                    let promise;
+                    cat.getlatestkey=function(){
                         promise = new Promise(function(resolve, reject) {
                             let key;
                             function setkey(_key){
@@ -881,10 +800,68 @@
                             //get trusted users
                             to.get('trust').once().map().once(async (data,mkey)=>{//grant users
                                 if(data[path]){//check if path exist as well trust user
-                                    console.log("FOUND PATH!");
+                                    //console.log("FOUND PATH!");
+                                    //console.log(mkey);
+        
+                                    let tto = gun.back(-1).user(mkey); //user public key
+                                    //let keycode = await to.get('key').get(pair.pub).get(path).then();
+                                    //console.log(keycode);
+                                    tto.get('key').get(pub).once(async (Adata,Akey)=>{
+                                        //console.log(Adata);
+                                        if(Adata==null){
+                                            return;
+                                        }
+                                        if(Adata[path] != null){
+                                            console.log("FOUND DATA >>> !!!")
+                                            if( Adata['_']['>'][path] >= cat.timegraph){
+                                                //console.log("// TIME //");
+                                                //update the latest time
+                                                cat.timegraph = Adata['_']['>'][path];
+                                                let Bdata = await SEA.decrypt(Adata[path], __key);
+                                                //console.log(Adata['_']['>'][path], Bdata);
+                                                //cb(Bdata);
+                                                //key = Bdata;
+                                                setkey(Bdata);
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                        promise.then(
+                            async function(result) { 
+                                /* handle a successful result */ 
+                                console.log(" done here!");
+                                console.log(result);
+                                //encode data
+                                //let enc1 = await SEA.encrypt(__key, result);
+                                //place graph
+                                //cb(result);
+                                cat.timegraph = 0;
+                                cat.getlatestkeyvalue(result);
+                                
+                            },
+                            function(error) { /* handle an error */ }
+                        );
+                    }
+
+                    cat.getlatestkeyvalue=function(__key){
+                        promise = new Promise(function(resolve, reject) {
+                            let key;
+                            function setkey(_key){
+                                key = _key;
+                            }
+                            function getkey(_key){
+                                return key;
+                            }
+                            setTimeout(() => resolve(getkey()), 1000);
+                            //get trusted users
+                            to.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                                if(data[path]){//check if path exist as well trust user
+                                    //console.log("FOUND PATH!");
                                     let tto = gun.back(-1).user(mkey); //user public key
                                     tto.get('value').get(pub).once(async (Adata,Akey)=>{
-                                        console.log(Adata);
+                                        //console.log(Adata);
                                         if(Adata==undefined){
                                             return;
                                         }
@@ -895,7 +872,7 @@
                                                 //console.log(Adata['_']['>'][path]);
                                                 let Bdata = await SEA.decrypt(Adata[path], __key);
                                                 //console.log(Bdata);
-                                                console.log(Adata['_']['>'][path], Bdata);
+                                                //console.log(Adata['_']['>'][path], Bdata);
                                                 //cb(Bdata);
                                                 //key = Bdata;
                                                 setkey(Bdata);
@@ -910,14 +887,16 @@
                             function(result) { 
                               /* handle a successful result */ 
                               cat.key = result
-                              console.log("done here! Value");
-                              console.log(result);
+                              //console.log("done here! Value");
+                              //console.log(result);
                               cb(result);
                             },
                             function(error) { /* handle an error */ }
                         );
     
                     }
+
+                    cat.getlatestkey();
 
                 }
             }
