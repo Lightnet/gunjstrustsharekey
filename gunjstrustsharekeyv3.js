@@ -193,7 +193,6 @@
         return gun;
     }
 
-
     function trustgetkey(cb, opt){
         console.log("`.trustgetkey` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -223,46 +222,66 @@
                 sec = await SEA.decrypt(sec, pair);
                 console.log(sec);
 
-                //get trusted users
-                user.get('trust').once().map().once(async (data,mkey)=>{//grant users
-                    console.log();
-
-                    if(data[path]){//check if path exist as well trust user
-                        console.log("FOUND PATH!");
-                        let uname;
-                        uname = await gun.back(-1).user(mkey).get('alias').then();
-                        //console.log(uname);
-
-                        let to = gun.back(-1).user(mkey); //user public key
-                        //let keycode = await to.get('key').get(pair.pub).get(path).then();
-                        //console.log(keycode);
-                        //gun.graphtime();
-                        //let time = to.get('key').get(pair.pub).get(path).graphtime();
-                        to.get('key').get(pair.pub).once(async (Adata,Akey)=>{
-                            //console.log(Adata);
-                            if( Adata['_']['>'][path] >= cat.timegraph){
-                                //console.log(Adata['_']['>'][path]);
-                                let Bdata = await SEA.decrypt(Adata[path], sec);
-                                //console.log(Bdata);
-
-                                console.log(Adata['_']['>'][path], Bdata);
-                                cb(Bdata);
-                            }
-
-                            //if(Adata[path]){
-                                //console.log(Adata[path]);
-                                //let Ddata = await SEA.decrypt(Adata[path], sec);
-                                //console.log(Ddata);
-                            //}
-                        });
-                        //console.log();
-
-
-
-
+                let promise = new Promise(function(resolve, reject) {
+                    let key;
+                    function setkey(_key){
+                        key = _key;
                     }
+                    function getkey(_key){
+                        return key;
+                    }
+                    
+                    
+                    //get trusted users
+                    user.get('trust').once().map().once(async (data,mkey)=>{//grant users
+                        console.log();
+                        
+                        if(data[path]){//check if path exist as well trust user
+                            console.log("FOUND PATH!");
+                            let uname;
+                            uname = await gun.back(-1).user(mkey).get('alias').then();
+                            //console.log(uname);
+
+                            let to = gun.back(-1).user(mkey); //user public key
+                            //let keycode = await to.get('key').get(pair.pub).get(path).then();
+                            //console.log(keycode);
+                            //gun.graphtime();
+                            //let time = to.get('key').get(pair.pub).get(path).graphtime();
+                            to.get('key').get(pair.pub).once(async (Adata,Akey)=>{
+                                //console.log(Adata);
+                                if( Adata['_']['>'][path] >= cat.timegraph){
+                                    //update the latest time
+                                    cat.timegraph = Adata['_']['>'][path];
+                                    //console.log(Adata['_']['>'][path]);
+                                    let Bdata = await SEA.decrypt(Adata[path], sec);
+                                    //console.log(Bdata);
+                                    console.log(Adata['_']['>'][path], Bdata);
+                                    //cb(Bdata);
+                                    //key = Bdata;
+                                    setkey(Bdata);
+                                }
+                                //if(Adata[path]){
+                                    //console.log(Adata[path]);
+                                    //let Ddata = await SEA.decrypt(Adata[path], sec);
+                                    //console.log(Ddata);
+                                //}
+                            });
+                            //console.log();
+                        }
+                    });
+
+                    setTimeout(() => resolve(getkey()), 1000);
 
                 });
+                promise.then(
+                    function(result) { 
+                      /* handle a successful result */ 
+                      console.log(result);
+                      console.log("done here!");
+                      cb(result);
+                    },
+                    function(error) { /* handle an error */ }
+                );
             }
 
             if(sharetype == "gun"){
@@ -878,6 +897,7 @@
         return path;
     }
 
+    //not working
     function graphtime( cb, opt){
         cb = cb || function(ctx) { return ctx };
         opt = opt || {};

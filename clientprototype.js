@@ -349,8 +349,9 @@ $("#btnmainsharedatagenkey").click(async function(){
 $("#btnmainsharedatalatestkey").click(async function(){
     let user = gun.user();
     user.get('sharedata').get('access').get('key').trustgetkey((ack)=>{
-        console.log("==========");
+        console.log("////==========");
         console.log(ack);
+        console.log("////==========");
     });
 });
 
