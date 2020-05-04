@@ -49,6 +49,19 @@ User / Gun functions:
  * Passphrase hint example.
  * Private Chat example. (WIP)
 
+## Install and Run:
+
+command line:
+
+```
+  npm install
+  npm start
+```
+
+
+
+
+
 ## Design & Guide:
  gun.js is database graph. By using namespace graph to check type object reason is typescript code langugae need to check types. Gun key graph root is need to create unique key or id on namespace root graph to identify as json object.
 
