@@ -19,7 +19,17 @@
  * Clean Up script.
 
 ## Information:
- This is just Gun chain share key, trust writable key, and encryption setup functions. To grant and revoke owner user key graph for users access to able to read data value for share key access. To used share key to write encrypt data for other can only read. The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value. As well encryptput and decryptonce key value to encode and decode owner as well other user but permission access read and write.
+  This is just Gun chain share key, trust writable key, and encryption setup functions.
+
+  Seajs has some basic call functions login/register user access for graph node to work with the script in gun chain calls. Each user graph can't be written but it can be read only.
+  
+  Once user login to their owning graph node that they can read, write, and edit. But can't edit other user graph node and read only. You can reference the user node. gun.user('public key').
+  
+  To grant and revoke owner user key graph node for users that has permission read only access data. There are some basic function calls to add and remove permission to users from owner root access. It used map table list that the owner has right top level graph access.
+ 
+  The distrust and trust function is to allow owner user key graph grant access users write or edit key graph owner data value on reference graph. As well encrypt put and decrypt once key value to encode and decode owner as well other user but permission access read and write. It used the graph table as well users graph to get the latest graph path data store.
+
+  Please note this script is test simple functions.
  
  To learn how SEA.js (Security Encryption Authorization ) that works with gun.js.
 
@@ -30,7 +40,7 @@
 User / Gun functions:
  - function grantkey (to allow owner user access to key graph value for other users. Check and create salt keys)
  - function revokekey (to owner revoke user access to key graph for user. Note it will break salt key if share with other users.)
-  - Recreate new slat key and reencrypt value.(This break other salt keys are shared.)
+  - Recreate new salt key and reencrypt value.(This break other salt keys are shared.)
  - function encryptput put value (allow owner user to encrypt key value when creating and check salt key)
  - function decryptvalue return value (allow owner user to decrypt key value)
  - function decryptdata (to allow other user to decrypt key value/data from gun or sea but not self)
@@ -57,10 +67,6 @@ command line:
   npm install
   npm start
 ```
-
-
-
-
 
 ## Design & Guide:
  gun.js is database graph. By using namespace graph to check type object reason is typescript code langugae need to check types. Gun key graph root is need to create unique key or id on namespace root graph to identify as json object.

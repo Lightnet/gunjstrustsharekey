@@ -402,7 +402,7 @@ $("#mainsharedataread").click(async function(){
 // GUN SHARE WRITE
 $("#btnsubsharedatawrite").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#mainsharedatainput').val(); //public key
+    let keyvalue = $('#sharewrite').val(); //public key
     if(!keyvalue){
         console.log("empty!");
         return;
