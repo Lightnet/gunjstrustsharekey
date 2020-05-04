@@ -331,6 +331,30 @@ $("#trustkey").click(async function(){
         console.log("FAIL");
     }
 });
+$("#btnmainsharedatagenkey").click(async function(){
+    let user = gun.user();
+    //let key = $('#accesskey').val();
+    //if(key.length == 0){console.log("EMPTY!");return;}
+    //let to = gun.user(key);
+    //let who = await to.get('alias').then();
+    //console.log(who);
+    //if(who != null){
+        //console.log("PASS");
+        //user.get('profile').get('alias').trustkey(to);
+        user.get('sharedata').get('access').get('key').trustgenkey();
+    //}else{
+        //console.log("FAIL");
+    //}
+});
+$("#btnmainsharedatalatestkey").click(async function(){
+    let user = gun.user();
+    user.get('sharedata').get('access').get('key').trustgetkey((ack)=>{
+        console.log("==========");
+        console.log(ack);
+    });
+});
+
+
 $("#distrustkey").click(async function(){
     let user = gun.user();
     let key = $('#accesskey').val();
@@ -412,9 +436,6 @@ $("#btnwriteget").click(async function(){
     }
 });
 
-
-
-
 $("#btnmainsharedatrust").click(async function(){
     let user = gun.user();
     let key = $('#accesskey').val();
@@ -443,9 +464,6 @@ $("#btnmainsharedadistrust").click(async function(){
         console.log("FAIL");
     }
 });
-
-
-
 
 $("#mainsharedatawrite").click(async function(){
     //let key = $('#inputsearchpublickey').val(); //public key
@@ -506,6 +524,38 @@ $("#btnsubsharedataread").click(async function(){
             $("#sharewrite").val(ack);
         });
 
+    }else{
+        console.log("Not found!");
+    }
+});
+
+
+$("#btnsubsharedatagenkey").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let user = gun.user();
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        console.log("found!", who);
+        //let pub = await to.get('pub').then();
+        to.get('sharedata').get('access').get('key').trustgenkey();
+
+    }else{
+        console.log("Not found!");
+    }
+});
+
+$("#btnsubsharedalatestkey").click(async function(){
+    let key = $('#inputsearchpublickey').val(); //public key
+    let user = gun.user();
+    let to = gun.user(key);
+    let who = await to.get('alias').then();
+    if((who != null)){
+        console.log("found!", who);
+        let pub = await to.get('pub').then();
+        to.get('sharedata').get('access').get('key').trustgetkey((ack)=>{
+            console.log(ack);
+        });
     }else{
         console.log("Not found!");
     }
