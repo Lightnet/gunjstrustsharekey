@@ -252,11 +252,156 @@ This same setup but with grant other user for share key setup added.
 work in progress...
 
 ## Grant and Revoke access functions:
- To grant and revoke access to users to read and write. Is very easy using prefix name in the graph and user root graph data.
+ To grant and revoke access to users to read and write graph node. It used prefix name in the graph node, pathing and user root graph data.
+
 ```javascript
  user.get('grant').get('publickey').get('path').put('data');
 ```
-  Only the owner has right to dis/allow access.
+  Only the owner has right to dis/allow access for read and write users.
+```javascript
+  // owner
+  // namespace user
+  // gun chain function
+  //...
+  let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+  gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+  //..
+  user.get('grant').once().map().once(async (data,mkey)=>{//grant users
+    if(data[path]){//check if path exist as well trust user
+      //path graph
+    }
+  });
+```
+  The reason there map is that path is store in owner path graph. It make sure that grant prefix name has right access to user to read from owner. Users have to write this own graph node to be write able. But depend on the coding it be used on gun graph node.
+
+```javascript
+  // owner reference
+  // namespace gun
+  // gun chain function
+  //...
+  let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+  gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+  //...
+  let countmax = 10;//limit back to root loop
+  let root;
+  for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+      let tmp = gun.back(i);//loop to find user root
+      if(tmp._.soul){
+          console.log("FOUND SOUL!");
+          root = tmp;
+          break;
+      }
+  }
+  if(root !=null){
+    let to = root;//user root graph
+    let enc1 = await to.get('grant').get(pair.pub).get(path).then();
+    let epub = await to.get('epub').then();
+    let pub = await to.get('pub').then();
+    let mix = await SEA.secret(epub, pair);
+    let pkey = await SEA.decrypt(enc1, mix);
+    console.log(pkey);
+    //...
+  }
+```
+  When using the namespace on gun is tricky.
 
 ## Trust functions:
-  It is base on grant and revoke access. It to add on to able to allow users to write new keys. But it will require promise delay time to query and compare graph latest node. Since there no indexing list in graph. In case of someone trying to access to key. It will generate new key.
+  It is base on grant and revoke access. It to add on to able to allow users to write new keys. It deal with the which graph is the latest node by the users. But it will require promise delay time to query and compare graph latest node. Since there no indexing list in graph. In case of someone trying to access to key. It will generate new key.
+```javascript
+ user.get('trust').get('publickey').get('path').put('data');  //list of user trust of path data graph
+ user.get('key').get('publickey').get('path').put('data');    //store key
+
+ let to = gun.user('publickey'); // reference user of owner read only
+ to.get('key').get('public').get('path').once((ack)=>{
+   console.log(ack);//data
+ });
+```
+
+
+```javascript
+  // owner reference
+  // namespace gun
+  // gun chain function
+  //...
+  let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+  gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+  //...
+  let countmax = 10;//limit back to root loop
+  let root;
+  for(let i=0;i<countmax;i++){//look for user soul root from let to = gun.user('key');
+      let tmp = gun.back(i);//loop to find user root
+      if(tmp._.soul){
+          console.log("FOUND SOUL!");
+          root = tmp;
+          break;
+      }
+  }
+  if(root !=null){
+    let to = root;//user root graph
+    let enc1 = await to.get('grant').get(pair.pub).get(path).then();
+    let epub = await to.get('epub').then();
+    let pub = await to.get('pub').then();
+    let mix = await SEA.secret(epub, pair);
+    let pkey = await SEA.decrypt(enc1, mix);
+    console.log(pkey);
+    //...
+    to.get('trust').once().map().once(async (data,mkey)=>{//grant users
+      if(data[path]){//check if path exist as well trust user
+        let topub = gun.back(-1).user(mkey); //user public key
+        //user data / get owner key
+        topub.get('key').get(pub).once(async (Adata,Akey)=>{
+          if( Adata['_']['>'][path] >= cat.timegraph){
+            cat.timegraph = Adata['_']['>'][path];
+            //...
+          }
+        });
+      }
+    });
+  }
+```
+  The code above is does get the latest graph node. But require promise to work when doing to callback onces.
+
+```javascript
+  let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
+  gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
+  //...
+  let promise = new Promise(function(resolve, reject) {
+    let key;
+    function setkey(_key){
+      key = _key;
+    }
+    function getkey(_key){
+      return key;
+    }
+    // add for wait time before it exit the promise
+    // It depend on how many users before timeout
+    setTimeout(() => resolve(getkey()), 1000); //1 second
+    to.get('trust').once().map().once(async (data,mkey)=>{//trust users list
+      if(data[path]){//check if path exist as well trust user
+        let topub = gun.back(-1).user(mkey); //user public key
+        //user data / get owner key
+        topub.get('key').get(pub).once(async (Adata,Akey)=>{ // data
+          if( Adata['_']['>'][path] >= cat.timegraph){ //timestamp
+            cat.timegraph = Adata['_']['>'][path]; //update the timestamp
+            let Bdata = await SEA.decrypt(Adata[path], pkey); //decode key
+            console.log(Adata['_']['>'][path], Bdata);
+            setkey(Bdata);
+          }
+        });
+      }
+    });
+  });
+
+  promise.then(
+  function(result) { 
+    /* handle a successful result */ 
+    console.log(result);
+    console.log("done here!");
+    cb(result); //callback to top
+  },
+  function(error) { /* handle an error */ }
+  );
+
+```
+THe code above will wait for the promise before timeout when variable store. It will get the latest graph node. It will do once callback.
+

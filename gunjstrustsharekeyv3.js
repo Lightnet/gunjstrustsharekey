@@ -303,7 +303,6 @@
                                         setkey(Bdata);
                                     }
                                 });
-
                             }
                         });
 
@@ -318,10 +317,8 @@
                         },
                         function(error) { /* handle an error */ }
                     );
-
                 }
             }
-
         }());
         return gun;
     }
