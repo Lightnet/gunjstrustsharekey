@@ -154,9 +154,8 @@ function setClipboard(value) {
   .catch(err => {
     console.log('Something went wrong', err);
   });
-
-
 }
+
 $("#aliaskeycopy").click(function(){
     let user = gun.user();
     if(!user.is)return;
@@ -165,6 +164,7 @@ $("#aliaskeycopy").click(function(){
 });
 //===============================================
 // LOGIN
+//===============================================
 $("#btnlogin").click(function(){
     //console.log("LOGIN......");
     let user = gun.user();
@@ -195,7 +195,6 @@ $("#btnlogin").click(function(){
             $("#navmenu").show();
         }
     });
-    
 });
 
 $("#btnforgot").click(function(){
@@ -317,20 +316,7 @@ $("#revokekey").click(async function(){
         modalmessage("Revoke access fail!");
     }
 });
-$("#trustkey").click(async function(){
-    let user = gun.user();
-    let key = $('#accesskey').val();
-    if(key.length == 0){console.log("EMPTY!");return;}
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS");
-        user.get('profile').get('alias').trustkey(to);
-    }else{
-        console.log("FAIL");
-    }
-});
+
 $("#btnmainsharedatagenkey").click(async function(){
     let user = gun.user();
     //let key = $('#accesskey').val();
@@ -355,25 +341,6 @@ $("#btnmainsharedatalatestkey").click(async function(){
     });
 });
 
-
-$("#distrustkey").click(async function(){
-    let user = gun.user();
-    let key = $('#accesskey').val();
-    if(key.length == 0){console.log("EMPTY!");return;}
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS");
-        user.get('profile').get('alias').distrustkey(to);
-    }else{
-        console.log("FAIL");
-    }
-});
-$("#trustlist").click(async function(){
-    let user = gun.user();
-    user.get('profile').get('alias').trustlist();
-});
 $("#putvalue").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
     let keyvalue = $('#dataalias').val();// input text
@@ -392,50 +359,6 @@ $("#putvalue").click(async function(){
 });
 
 //https://github.com/amark/gun/blob/master/lib/mix.js
-$("#btnwriteput").click(async function(){
-
-    let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#sharewrite').val();// input text
-    if(!keyvalue){
-        console.log("empty!");
-        return;
-    }
-    let user = gun.user();
-    var seckey = await SEA.work("test", "test");
-    var msg = "test"
-    msg = keyvalue;
-    var enc = await SEA.encrypt(msg, seckey);
-    user.get('sharedata').get(user._.sea.pub).get('access').get('key').encryptput("RANDOMASDF");
-});
-
-$("#btnwriteget").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#dataalias').val();// input text
-    let user = gun.user();
-    var seckey = await SEA.work("test", "test");
-
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-
-    if((who != null)&&(keyvalue.length > 0)){
-        to.get('sharedata').get(key).get('profile').get('alias').once(async (ack)=>{
-            console.log(ack);
-            let data = await SEA.decrypt(ack, seckey);
-            console.log(data);
-            $("#sharewrite").val(data);
-        });
-        console.log("WHO",who);
-    }else{
-        user.get('sharedata').get(user._.sea.pub).get('access').get('key').decryptonce((ack)=>{
-            //console.log(ack);
-            //let data = await SEA.decrypt(ack, seckey);
-            //console.log(data);
-            $("#sharewrite").val(ack);
-            console.log(ack);
-        });
-        console.log("OWNER");
-    }
-});
 
 $("#btnmainsharedatrust").click(async function(){
     let user = gun.user();
@@ -530,7 +453,6 @@ $("#btnsubsharedataread").click(async function(){
     }
 });
 
-
 $("#btnsubsharedatagenkey").click(async function(){
     let key = $('#inputsearchpublickey').val(); //public key
     let user = gun.user();
@@ -562,182 +484,7 @@ $("#btnsubsharedalatestkey").click(async function(){
     }
 });
 
-
-$("#btnsharetrustlist").click(async function(){
-    let user = gun.user();
-    user.get('sharedata').get(user._.sea.pub).get('access').get('key').trustlist();
-});
-
-$("#btnmap").click(async function(){
-    //console.log(Gun.text.random());
-    //let genid = Gun.text.random();
-    //gun.get('data').get(genid).put({name:"foo",foo:"bar"});
-    //gun.get(genid).put({name:"foo",foo:"bar"});
-    //function callback(data){
-        //console.log(data);  
-    //}
-    //gun.get({'#': {'>': '*'}, '%': 50000}).map().once(callback)
-    //gun.get('data').get({'.': {'>': genid}}).map().once(callback)
-    //gun.get('data').get({'.': {'>': "FztS1VqZoZQUkjosL6oyDf3G"}}).map().once(callback)
-    //console.log(gun);
-    //gun.map().once(callback);
-
-    //Gun().put({foo: 'bar'}); 
-    //Gun().get('foo').once(ack=>{
-        //console.log(ack)
-    //}); 
-});
-
-$("#btnwriteputmix").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    let keyvalue = $('#sharewrite').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    console.log("WRITE SHARE:")
-    
-    let who = await to.get('alias').then();
-    console.log("who:",who)
-    if(who != null){
-        console.log("SET WRITE OWN");
-        //add user at ref owner sharekey for write to write own to ref update graph.
-        user.get('sharedata').get(key).get('access').get('key').put(keyvalue, function(ack){
-            console.log(ack);
-        });
-    }
-});
-
-$("#btnwritegetmix").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    //let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    console.log("WRITE SHARE:")
-
-    let who = await to.get('alias').then();
-    console.log("who:",who)
-    if(who != null){
-        user.get('sharedata').get(key).get('access').get('key').once(function(ack){
-            console.log(ack);
-        });
-    }
-});
 //https://gist.github.com/Lightnet/836b4d29b8104e06c2dd558e4d591b28#file-clientprototype-js-L475-L569
-$("#btngetlatestgraph").click(async function(){
-//===============================================
-//
-//===============================================
-
-    let key = $('#inputsearchpublickey').val(); //public key
-    //let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    console.log("WRITE SHARE:");
-
-    let who = await to.get('alias').then();
-    console.log("who:",who)
-    if((who != null)){
-        console.log("SET WRITE OWN");
-        //add user at ref owner sharekey for write to write own to ref update graph.
-        //user.get('sharedata').get(key).get('access').get('key').put("ASDF");
-        let rootpub = key;
-        let cat = {};
-        cat.idx = 0;
-        cat.count = 0;
-        cat.timegraph = 0;
-        cat.idgraph = 'key'; //graph key id
-        cat.datagraph;
-
-        //get graph path
-        let rootpath = to.get('sharedata').get(rootpub).get('access').get(cat.idgraph).graphpath();
-        console.log("rootpath:",rootpath);
-        //console.log("rootpath",rootpath);
-        //let rootindex = await to.get('trust').get(rootpath).get('index').then();
-        //cat.rootindex = rootindex - 1;
-        //cat.rootindex = rootindex;
-        //console.log("rootindex",rootindex);
-
-        //time different
-        //user.get('sharedata').get(rootpub).get('access').get(cat.idgraph).once(ack=>{
-            //console.log("FROM CURRENT USER ROOT!");
-            //console.log(ack);
-            //console.log("=======!");
-        //});
-
-        cat.ownpub=function(to){
-            console.log("list pubs");
-            to.get('trust').get(rootpath).once().map().once((d,k)=>{
-                //cat.idx++;
-                //console.log(Gun.node.soul(key))
-                console.log(d);
-                //if(k != "index"){
-                    cat.pub(k);
-                //}
-            })
-        }
-
-        //query
-        cat.queue=function(){
-            //used RAD#LEX
-            //add user key and timestamp
-            let user = gun.user();
-            let glist = user.get('list');
-
-        }
-        //compare graph node time stamp
-        cat.pub=async function(publickey){
-            console.log("pub: ", publickey);
-            let ref = gun.user(publickey);
-            let who = await ref.get('alias').then();
-            if(!who)return;
-            console.log("pub who:",who);
-            //let keygraph = await ref.get('sharedata').get(rootpub).get('access').get('key').then();
-            //console.log(keygraph);
-
-            //path for sharewrite
-            ref.get('sharedata').get(rootpub).get('access').on(function(data, key, at, ev){
-                ev.off();
-                console.log("data");
-                console.log(data);
-                //let bfound = false;
-                //check time stmap update and call back
-                if( data['_']['>'][cat.idgraph] >= cat.timegraph){
-                    cat.timegraph = data['_']['>'][cat.idgraph];
-                    cat.datagraph = data[cat.idgraph];
-                    console.log(cat.datagraph);
-                    //bfound = true;
-                }
-                cat.check();
-            });
-        }
-
-        cat.check=function(){
-            //this may not work will callback and compare
-            //cat.count++;
-
-            console.log("checking...");
-            //console.log(`index: ${cat.idx}`);
-            //console.log(`count: ${cat.count}`);
-
-            //if(cat.idx == cat.count){//check for loop.
-                //console.log("cat.datagraph");
-                //console.log(cat.datagraph);
-            //}
-
-            //if(cat.rootindex == cat.count){
-                //console.log("cat.datagraph");
-                //console.log(cat.datagraph);
-            //}
-        }
-
-        cat.ownpub(to);//call at to get latest graph id for value
-    }
-});
 
 $("#searchpublickeypaste").click(async function(){
     $('#inputsearchpublickey').focus();
@@ -759,40 +506,6 @@ $("#searchpublickeypaste").click(async function(){
           
         }
     });
-});
-
-$("#btngrantaccess").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    //let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS: GRANT ACCESS");
-        user.get('sharedata').get(user._.sea.pub).get('access').get('key').grantkey(to);
-    }else{
-        console.log("FAIL");
-    }
-});
-
-$("#btntrustaccess").click(async function(){
-    let key = $('#inputsearchpublickey').val(); //public key
-    //let keyvalue = $('#dataalias').val();// input text
-    //gun/lib/mix.js
-    //Gun.state.node = function(node, vertex, opt){
-    let user = gun.user();
-    let to = gun.user(key);
-    let who = await to.get('alias').then();
-    //console.log(who);
-    if(who != null){
-        console.log("PASS: WRITE ACCESS");
-        user.get('sharedata').get(user._.sea.pub).get('access').get('key').trustkey(to);
-    }else{
-        console.log("FAIL");
-    }
 });
 
 $("#accesskey").keyup(async function() {
@@ -1091,6 +804,7 @@ $(window).resize(function() {
 MessagesResize();
 //===============================================
 // PUBLIC CHAT
+//===============================================
 var gunchat;
 function timestamp(){
     let currentDate = new Date();
@@ -1538,11 +1252,9 @@ $('#testlist').click(function(){
         }else{
             console.log("not update...");
         }
-
     })
-
-
 });
+
 $('#updatelist').click(function(){
     console.log("test build");
     var gunlist = gun.get("testlist");

@@ -909,21 +909,6 @@
         return path;
     }
 
-    //not working
-    function graphtime( cb, opt){
-        cb = cb || function(ctx) { return ctx };
-        opt = opt || {};
-        let gun = this, user = gun.back(-1).user(), pair = user._.sea, path = '';
-        gun.back(function(at){ if(at.is){ return } path += (at.get||'') });
-        (async function(){
-
-            console.log(gun);
-
-        }());
-        //return gun;
-        return path;
-    }
-
     function decryptonce( cb, opt){
         console.log("`.decryptonce` PROTOTYPE API MAY BE CHANGED OR RENAMED USE!");
         cb = cb || function(ctx) { return ctx };
@@ -1009,23 +994,22 @@
         return gun;
     }
     //SETUP FUNCTION for GUN
-    Gun.chain.trustkey = trustkey;
-    Gun.chain.distrustkey = distrustkey;
-    Gun.chain.grantkey = grantkey;
-    Gun.chain.revokekey = revokekey;
-    Gun.chain.encryptput = encryptput;
-    Gun.chain.decryptonce = decryptonce;
+    Gun.chain.grantkey      = grantkey;     //user public key
+    Gun.chain.revokekey     = revokekey;    //user public key
+    Gun.chain.encryptput    = encryptput;
+    Gun.chain.decryptonce   = decryptonce;
 
-    Gun.chain.trustgenkey = trustgenkey; //gnerate key
-    Gun.chain.trustgetkey = trustgetkey; //get latest key graph node
+    Gun.chain.trustkey      = trustkey;     //user public key
+    Gun.chain.distrustkey   = distrustkey;  //user public key
+    Gun.chain.trustgenkey   = trustgenkey;  //generate key
+    Gun.chain.trustgetkey   = trustgetkey;  //get latest key graph node
 
-    Gun.chain.trustget = trustget; //
-    Gun.chain.trustput = trustput; //
+    Gun.chain.trustget      = trustget;     //
+    Gun.chain.trustput      = trustput;     //
 
-    Gun.chain.graphpath = graphpath;
-    Gun.chain.graphtime = graphtime;
+    Gun.chain.graphpath     = graphpath;
 
     //TESTING...
-    Gun.chain.trustlist = trustlist;
+    Gun.chain.trustlist     = trustlist;
     
 }());
