@@ -1,7 +1,7 @@
 const { src, dest, parallel } = require('gulp');
 const concat = require('gulp-concat');
 //const terser = require('gulp-terser');
-const sourcemaps = require('gulp-sourcemaps');
+//const sourcemaps = require('gulp-sourcemaps');
 
 var scriptsharekeyfile = 'gunjstrustsharekeyv2.js';
 
@@ -16,7 +16,7 @@ function js() {
 }
 
 function jsmin() {
-    let bsourcemaps = true;
+    let bsourcemaps = false;
     return src(scriptsharekeyfile, { sourcemaps: bsourcemaps })
         //.pipe(sourcemaps.init())
         //.pipe(terser())

@@ -21,9 +21,6 @@
   },
   "homepage": "https://github.com/Lightnet/gunjstrustsharekey#readme",
   "dependencies": {
-    "gulp": "^4.0.2",
-    "gulp-concat": "^2.6.1",
-    "gulp-sourcemaps": "^2.6.5",
-    "gun": "^0.2020.421"
+    "gun": "^0.2020.1235"
   }
 }
