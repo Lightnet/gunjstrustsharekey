@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title></title>
+    <title>gun js</title>
     <meta name="description" content="">
     <!--<link id="favicon" rel="icon" href="" type="image/x-icon">-->
     <meta charset="utf-8">
@@ -24,10 +24,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/promise.js"></script>
     <!--
     <script src="https://cdn.jsdelivr.net/npm/gun/lib/then.js"></script>
-    -->
     <script src="/gunjstrustsharekeyv3.js"></script>
-    
-    <!--
     <script src="/sea.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>  
     <script src="/gunadapter.js"></script>
@@ -35,161 +32,8 @@
     
   </head>
   <body>
-      <label>Nodejs http with Gun.js</label>
-      <label id="guntext">...</label>
-      <button id="btngun">Gun</button>
-      <button id="btnuser">User</button>
-      <button id="aliaskeycopy"> Alias: Unknown </button>
-      <a href="/prototype.html">Prototpe Test</a>
-      <!--<button id="btnshowmodal">Modal</button>-->
-      <div id="navmenu">
-        <button id="btnprofile"> Profile </button>
-        <button id="btnchangepassphrase"> Change Passphrase </button>
-        <button id="btnpassphrase"> Passphrase Hint </button>
-        <button id="btnmessage"> Messages </button>
-        <button id="btnpublicchat"> Public Chat </button>
-        <button id="btnprivatechat"> Private Chat </button>
-      </div>
-      
-        <div id="login">
-          <select id="users">
-            <option selected="true" disabled>-- Select User! --</option>
-          </select>
-          Alias:<input id="alias" value="test" />
-          Passphrase:<input id="passphrase" value="test" />
-          <button id="btnlogin">Login</button>
-          <button id="btnforgot">Forgot</button>
-          <button id="btnregister">Register</button>
-        </div>
-
-        <div id="forgot">
-            Alias:<input id="falias" placeholder="username" />
-            <br>Question 1:<input id="fquestion1" value="" placeholder="question #1"/>
-            <br>Question 2:<input id="fquestion2" value="" placeholder="question #2"/>
-            <br>Hint:<input id="fhint" value=""  placeholder="passphrase hint"/>
-            <br><button id="btnforgothint">Get Hint</button>
-            <button id="btnbacklogin">Cancel</button>
-        </div>
-
-        <div id="profile">
-            Public Key: <input id="aliaspublickey" readonly size="98"><button id="copypublickey">Copy</button>
-
-            <br>Profile:<label id="username"></label>
-            <br>
-            <br>Access Public Key: <input id="accesskey" placeholder="public key" size="90"/> <label id="lookalias">None</label>
-            <br>Alias: <input id="inputalias" placeholder="value"/> 
-            <button id="getalias"> Get Value </button>
-            <button id="grantkey"> Grant (share key) </button> 
-            <button id="revokekey"> Revoke (share key) </button>
-            
-            <br>
-            <br>Main Share data:
-            <input id="mainsharedatainput">
-            <button id="mainsharedatawrite"> Share Write </button>
-            <button id="mainsharedataread"> Share Read </button>
-            <button id="btnmainsharedatrust"> Trust Key </button>
-            <button id="btnmainsharedadistrust"> Distrust Key </button>
-            <button id="btnmainsharedatagenkey"> Gen Key </button>
-            <button id="btnmainsharedatalatestkey"> Latest Key </button>
-            <br> Delay Query get graph nodes.
-
-            <br>
-            <br> Search Public Key:
-            <br> <input id="inputsearchpublickey" size="98" placeholder="public key"/><button id="searchpublickeypaste">Paste</button><label id="searchalias"> Alias: ?</label>
-            <br> Alias: <input id="dataalias" placeholder="value"/><!--<button id="putvalue"> Put? </button>-->
-            <br>
-            <br> Public Share Data: <input id="sharewrite" placeholder="value"/> 
-            <button id="btnsubsharedatawrite"> Write Data </button>
-            <button id="btnsubsharedataread"> Read Data </button>
-            <button id="btnsubsharedatagenkey"> Gen Key </button>
-            <button id="btnsubsharedalatestkey"> Latest Key </button>
-
-            
-        </div>
-
-        <div id="changepassphrase">
-          Old passphrase:<input id="oldpassphrase" value="" placeholder="old passphrase"/>
-          <br>New passphrase:<input id="newpassphrase" value="" placeholder="new passphrase"/>
-          <br><button id="btnchangepassphraseapply"> Apply </button>
-        </div>
-
-        <div id="passphrasehint">
-          Question 1:<input id="question1" value="" placeholder="Question #1"/>
-          <br>Question 2:<input id="question2" value="" placeholder="Question #2"/>
-          <br>Hint:<input id="hint" value="" placeholder="passphrase hint"/>
-          <br><button id="btnapplypassphrasehint"> Apply Hint </button>
-          <button id="btngetpassphrasehint"> Get Hint </button>
-        </div>
-
-        <div id="messages" style="height:100%;width:100%;">
-          <div id="messagesdiv" style="height:22px;width:100%;">
-            <select id="usercontacts">
-              <option selected disabled>-- Select User --</option>
-            </select>
-            <label>Public Key:</label><input id="mpublickey" value="" placeholder="public key"/>
-            <button id="btnadduser">+</button>
-            <button id="btnremoveuser">-</button>
-            <label id="mwho">who?</label>
-          </div>
-          <div id="messagelist" style="background-color: darkgray;">
-            
-          </div>
-          <div id="messageinputarea"style="height:22px;width:100%">
-            <input id="inputmessagechat" value="" placeholder="type here and press enter">
-          </div>
-        </div>
-
-        <div id="publicchat">
-          Public Chat
-          <div id="publicchatlist" style="background-color: darkgray;overflow-y: scroll;">
-            Not Init.
-          </div>
-          <div id="publicchatarea"style="height:22px;width:100%">
-            <input id="inputpublicchat" value="" placeholder="type here and press enter">
-          </div>
-        </div>
-
-        <div id="privatechat">
-          Private Chat
-          <button id="btnprivatechatcreate">create</button>
-          <select id="privatechatroom">
-            <option selected disabled>-- Select Private Chat --</option>
-          </select>
-          <input id="privatechatkey" placeholder="private chat room key"/>
-          <button id="btnprivatechatjoin">Enter</button>
-          <button id="btnprivatechatleave">Leave</button>
-          <button id="btnprivatechatadd">+</button>
-          <button id="btnprivatechatremove">-</button>
-
-          <label id="btnprivatechatname">key?</label>
-          <input id="ppublickey" placeholder="public key"/>
-          <button id="btnprivatechatgrant">grant</button>
-          <button id="btnprivatechatrevoke">revoke</button>
-
-          <div id="privatechatlist" style="background-color: darkgray;overflow-y: scroll;">
-            Not Init.
-          </div>
-          <div id="privatechatarea"style="height:22px;width:100%">
-            <input id="inputprivatechat" value="" placeholder="type here and press enter">
-          </div>
-        </div>
-
-        <div id="Modal" class="modal">
-          <div id="dialog" class="modal-content">
-            <p>Message:<label id="dialogmessage">None</label></p>
-            <button id="btndialogokay">Okay</button>
-          </div>
-        </div>
-        <br>
-        <br>
-        <!--
-        <div id="testpanel" class="">
-          <button id="testlist"> List </button>
-        </div>
-        -->
-
-        <script src="/clientprototype.js" defer></script>
-    <footer>
-    </footer>
+    <div id="app"></div>
+    <div id="modal"></div>
+    <script type="module" src="/client.js"></script>
   </body>
 </html>

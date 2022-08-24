@@ -1,7 +1,7 @@
-var fs = require("fs");
-var path = require("path");
-const http = require("http");
-const Gun = require("gun");
+import fs from "fs";
+import path from "path";
+import http from "http";
+import Gun from "gun";
 //require("gun/sea");//note make sure python 2.7 is install to work.
 var { PORT = 8080, NODE_ENV } = process.env;
 const dev = NODE_ENV === "development";
@@ -77,10 +77,10 @@ var gun = Gun({
 gun.on("hi", peer => {
   //peer connect
   //console.log('connect peer to',peer);
-  console.log("peer connect!");
+  //console.log("peer connect!");
 });
 gun.on("bye", peer => {
   // peer disconnect
   //console.log('disconnected from', peer);
-  console.log("disconnected from peer!");
+  //console.log("disconnected from peer!");
 });

@@ -12,6 +12,7 @@
  * Nodejs (Not working atm)
  * Browser (Working)
  * v3 work in progress.
+ * Reworking
 
 ## To Do List:
  * Debug and errors check keys.

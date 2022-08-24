@@ -1,8 +1,9 @@
 {
   "name": "gunjstrustsharekey",
   "version": "1.0.0",
-  "description": "* Amark (https://github.com/amark/gun)",
-  "main": "gunjstrustsharekey.js",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "node server.js"
   },
@@ -16,11 +17,7 @@
   ],
   "author": "Lightnet",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Lightnet/gunjstrustsharekey/issues"
-  },
-  "homepage": "https://github.com/Lightnet/gunjstrustsharekey#readme",
   "dependencies": {
-    "gun": "^0.2020.1235"
+    "gun": "^0.2020.1238"
   }
 }
